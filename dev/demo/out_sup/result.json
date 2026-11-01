@@ -1,0 +1,116 @@
+{
+  "method": "paired_binary",
+  "method_label": "McNemar test for binary matched pairs",
+  "book_ref": "§8.1",
+  "tier": "A",
+  "estimates": [
+    {
+      "measure": "P(schoolsup = yes)",
+      "estimate": 0.104776579352851,
+      "lower": null,
+      "upper": null,
+      "book_ref": "§8.1"
+    },
+    {
+      "measure": "P(famsup = yes)",
+      "estimate": 0.613251155624037,
+      "lower": null,
+      "upper": null,
+      "book_ref": "§8.1"
+    },
+    {
+      "measure": "Difference of proportions (schoolsup - famsup)",
+      "estimate": -0.508474576271186,
+      "lower": -0.550295565087916,
+      "upper": -0.464829179189973,
+      "book_ref": "§8.1.2"
+    },
+    {
+      "measure": "Difference of proportions (famsup - schoolsup)",
+      "estimate": 0.508474576271186,
+      "lower": 0.464829179189973,
+      "upper": 0.550295565087916,
+      "book_ref": "§8.1.2"
+    },
+    {
+      "measure": "Marginal odds ratio schoolsup vs famsup (population-averaged)",
+      "estimate": 0.0738113977806416,
+      "lower": null,
+      "upper": null,
+      "book_ref": "§8.2.2"
+    },
+    {
+      "measure": "Marginal odds ratio famsup vs schoolsup (population-averaged)",
+      "estimate": 13.5480431216311,
+      "lower": null,
+      "upper": null,
+      "book_ref": "§8.2.2"
+    },
+    {
+      "measure": "Conditional odds ratio n12/n21: schoolsup vs famsup (subject-specific)",
+      "estimate": 0.0544412607449857,
+      "lower": null,
+      "upper": null,
+      "book_ref": "§8.2.4"
+    },
+    {
+      "measure": "Conditional odds ratio n21/n12: famsup vs schoolsup (subject-specific)",
+      "estimate": 18.3684210526316,
+      "lower": null,
+      "upper": null,
+      "book_ref": "§8.2.4"
+    }
+  ],
+  "tests": [
+    {
+      "test": "McNemar X2",
+      "statistic": 295.923913043478,
+      "df": 1,
+      "p_value": 2.54585339079143e-66,
+      "book_ref": "§8.1.1"
+    },
+    {
+      "test": "Exact binomial (n12 ~ Bin(n*, 0.5))",
+      "statistic": 19,
+      "df": null,
+      "p_value": 1.01599682122314e-79,
+      "book_ref": "§8.1.1"
+    }
+  ],
+  "tables": {
+    "counts": {
+      "rows": ["yes", "no"],
+      "cols": ["yes", "no"],
+      "values": [
+        [49, 19],
+        [349, 232]
+      ]
+    },
+    "marginal": [
+      {
+        "category": "yes",
+        "schoolsup_count": 68,
+        "schoolsup_prop": 0.104776579352851,
+        "famsup_count": 398,
+        "famsup_prop": 0.613251155624037
+      },
+      {
+        "category": "no",
+        "schoolsup_count": 581,
+        "schoolsup_prop": 0.895223420647149,
+        "famsup_count": 251,
+        "famsup_prop": 0.386748844375963
+      }
+    ]
+  },
+  "warnings": [],
+  "facts": ["共 649 人，每人兩次測量（schoolsup、famsup），類別：no、yes。", "schoolsup 選「yes」的比例 0.105，famsup 為 0.613，差 -0.508（95% score 信賴區間 -0.550 到 -0.465）。", "回答改變的人：schoolsup 是「yes」但 famsup 不是的有 n12 = 19 人，反過來的有 n21 = 349 人；兩次回答相同的 281 人不影響檢定。", "主要檢定：McNemar X2，P < 0.001。", "McNemar X² = 295.92（df = 1），P < 0.001；精確二項檢定 P < 0.001。", "邊際勝算比（整體平均）：schoolsup 對 famsup = 0.074，famsup 對 schoolsup = 13.548。", "條件勝算比（同一個人）：schoolsup 對 famsup = n12/n21 = 0.054，famsup 對 schoolsup = n21/n12 = 18.368。"],
+  "notes": {
+    "primary_test": "McNemar X2",
+    "success": "yes",
+    "n_discordant": 368,
+    "reminder": "McNemar 只用到回答改變的人；條件勝算比是個體層次，邊際勝算比是整體層次，兩者不可混稱（§8.2.4）。"
+  },
+  "plots": ["square_table.png", "marginals.png"],
+  "report": "分析報告_student_por_paired_binary.md"
+}

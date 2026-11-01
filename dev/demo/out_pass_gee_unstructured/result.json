@@ -1,0 +1,131 @@
+{
+  "method": "gee_binary",
+  "method_label": "Marginal logistic model fitted by GEE",
+  "book_ref": "§9.2",
+  "tier": "A",
+  "estimates": [
+    {
+      "term": "(Intercept)",
+      "estimate": 1.33500898159904,
+      "se": 0.12319808636765,
+      "z": 10.8362801806441,
+      "p_value": 2.31701645463836e-27,
+      "odds_ratio": 3.80003007661249,
+      "or_lower": 2.98483709063687,
+      "or_upper": 4.83786154643316,
+      "or_reverse": 0.263155811885427,
+      "or_reverse_lower": 0.206702897634033,
+      "or_reverse_upper": 0.335026659624707
+    },
+    {
+      "term": "period2",
+      "estimate": 0.104520775239821,
+      "se": 0.0816266959876304,
+      "z": 1.28047293811403,
+      "p_value": 0.200378856345643,
+      "odds_ratio": 1.11017845785034,
+      "or_lower": 0.946045504505423,
+      "or_upper": 1.30278744775527,
+      "or_reverse": 0.900756083788833,
+      "or_reverse_lower": 0.767584920873334,
+      "or_reverse_upper": 1.05703160708193
+    },
+    {
+      "term": "period3",
+      "estimate": 0.565034744672861,
+      "se": 0.0875438465509246,
+      "z": 6.45430566435275,
+      "p_value": 1.08716185719396e-10,
+      "odds_ratio": 1.75950891522145,
+      "or_lower": 1.48208808008708,
+      "or_upper": 2.08885805394364,
+      "or_reverse": 0.56834039961323,
+      "or_reverse_lower": 0.478730470992062,
+      "or_reverse_upper": 0.67472373162953
+    },
+    {
+      "term": "sexM",
+      "estimate": -0.440810487906895,
+      "se": 0.167408376685355,
+      "z": -2.63314474839811,
+      "p_value": 0.00845982847734549,
+      "odds_ratio": 0.643514648825868,
+      "or_lower": 0.463511132039006,
+      "or_upper": 0.893422130838125,
+      "or_reverse": 1.55396617905212,
+      "or_reverse_lower": 1.11929172726211,
+      "or_reverse_upper": 2.15744548701766
+    }
+  ],
+  "tests": [
+    {
+      "test": "Wald (robust SE): period",
+      "statistic": 47.8356519730752,
+      "df": 2,
+      "p_value": 4.0984548482463e-11,
+      "book_ref": "§9.2.4"
+    },
+    {
+      "test": "Wald (robust SE): sex",
+      "statistic": 6.93345126601656,
+      "df": 1,
+      "p_value": 0.00845982847734551,
+      "book_ref": "§9.2.4"
+    }
+  ],
+  "tables": {
+    "proportions": [
+      {
+        "time": "1",
+        "n": 649,
+        "successes": 492,
+        "proportion": 0.75808936825886
+      },
+      {
+        "time": "2",
+        "n": 649,
+        "successes": 504,
+        "proportion": 0.776579352850539
+      },
+      {
+        "time": "3",
+        "n": 649,
+        "successes": 549,
+        "proportion": 0.845916795069337
+      }
+    ]
+  },
+  "warnings": [],
+  "facts": ["資料沒有 id 欄，依列號產生 id（1–649），每一列視為一個叢集。", "把 G1、G2、G3 轉成長格式：G 欄為測量值，period 欄為時間（1 = G1、2 = G2、3 = G3），共 1947 列。", "新變數 passed 由 G 轉換：< 10 → fail；≥ 10 → pass。", "提醒：把連續的 G 切成類別會損失資訊，結論可能隨切點改變。", "共 649 個叢集、1947 筆觀察值；每個叢集的筆數：3 筆 649 個。", "叢集間變數（同一個叢集內不變）：sex；叢集內變數（同一個叢集內會變）：period。", "邊際 logistic 模型（GEE），成功 =「pass」，working correlation = unstructured（估計相關 0.626, 0.640, 0.686）。", "period2：整體來說，勝算比 = 1.110（95% 信賴區間 0.946 到 1.303），P = 0.200。", "period3：整體來說，勝算比 = 1.760（95% 信賴區間 1.482 到 2.089），P < 0.001。", "sexM：整體來說，勝算比 = 0.644（95% 信賴區間 0.464 到 0.893），P = 0.008。", "Wald (robust SE): period = 47.84（df = 2），P < 0.001。", "Wald (robust SE): sex = 6.93（df = 1），P = 0.008。"],
+  "notes": {
+    "effect_type": "population-averaged",
+    "corstr": "unstructured",
+    "working_correlation": [0.625656834535983, 0.640053442376115, 0.685922501947762],
+    "clusters": {
+      "n_clusters": 649,
+      "n_obs": 1947,
+      "sizes": 649,
+      "n_singleton": 0
+    },
+    "cluster_level": {
+      "period": "within",
+      "sex": "between"
+    },
+    "predictors": {
+      "period": {
+        "type": "factor",
+        "ref": "1",
+        "levels": ["1", "2", "3"]
+      },
+      "sex": {
+        "type": "factor",
+        "ref": "F",
+        "levels": ["F", "M"]
+      }
+    },
+    "cluster_reminder": "GEE 的 robust SE 是大樣本方法，叢集少時傾向低估（§9.2.4）；本資料有 649 個叢集，課本沒有給門檻，請自行判斷是否足夠。",
+    "reminder": "勝算比是「整體平均」的效果；SE 為 robust（sandwich）SE，即使 working correlation 設錯也有效（§9.2.2）。"
+  },
+  "plots": "proportions.png",
+  "report": "分析報告_student_por_gee_binary.md"
+}

@@ -1,0 +1,1 @@
+{"analysis": "gee_nominal", "reshape": {"cols": ["Mjob","Fjob"], "value": "job", "time": "parent", "time_values": ["mother","father"]}, "y": "job", "time": "parent", "x": ["school"]}

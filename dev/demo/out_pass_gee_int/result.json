@@ -1,0 +1,164 @@
+{
+  "method": "gee_binary",
+  "method_label": "Marginal logistic model fitted by GEE",
+  "book_ref": "§9.2",
+  "tier": "A",
+  "estimates": [
+    {
+      "term": "(Intercept)",
+      "estimate": 1.31597786270244,
+      "se": 0.125127683949204,
+      "z": 10.5170800031483,
+      "p_value": 7.20726454525254e-26,
+      "odds_ratio": 3.72839506172842,
+      "or_lower": 2.9175146561404,
+      "or_upper": 4.76464778233899,
+      "or_reverse": 0.2682119205298,
+      "or_reverse_lower": 0.209879102439991,
+      "or_reverse_upper": 0.342757489802264
+    },
+    {
+      "term": "period2",
+      "estimate": 0.147148930460746,
+      "se": 0.101919646505725,
+      "z": 1.44377394845537,
+      "p_value": 0.148802572378672,
+      "odds_ratio": 1.15852649006622,
+      "or_lower": 0.9487500419962,
+      "or_upper": 1.41468623849667,
+      "or_reverse": 0.86316541622008,
+      "or_reverse_lower": 0.706870522090227,
+      "or_reverse_upper": 1.05401839866691
+    },
+    {
+      "term": "period3",
+      "estimate": 0.580141621849866,
+      "se": 0.114640410667761,
+      "z": 5.06053335355864,
+      "p_value": 4.18085312615909e-07,
+      "odds_ratio": 1.78629139072848,
+      "or_lower": 1.42682335871293,
+      "or_upper": 2.23632232617006,
+      "or_reverse": 0.559819078337597,
+      "or_reverse_lower": 0.447162731551585,
+      "or_reverse_upper": 0.700857603636414
+    },
+    {
+      "term": "sexM",
+      "estimate": -0.399687130828283,
+      "se": 0.184602247879246,
+      "z": -2.1651260232201,
+      "p_value": 0.0303780355809437,
+      "odds_ratio": 0.670529801324498,
+      "or_lower": 0.466965038502169,
+      "or_upper": 0.962834853560847,
+      "or_reverse": 1.49135802469137,
+      "or_reverse_lower": 1.03859971032593,
+      "or_reverse_upper": 2.14148794352482
+    },
+    {
+      "term": "period2:sexM",
+      "estimate": -0.0912089145784062,
+      "se": 0.165582338292058,
+      "z": -0.550837218022188,
+      "p_value": 0.581745268280979,
+      "odds_ratio": 0.912826988112195,
+      "or_lower": 0.659848949791844,
+      "or_upper": 1.26279372042471,
+      "or_reverse": 1.09549784682428,
+      "or_reverse_lower": 0.791894973680795,
+      "or_reverse_upper": 1.51549835809462
+    },
+    {
+      "term": "period3:sexM",
+      "estimate": -0.0331769514680018,
+      "se": 0.176195794135767,
+      "z": -0.188295933116528,
+      "p_value": 0.850644673239042,
+      "odds_ratio": 0.967367367367369,
+      "or_lower": 0.684878134626641,
+      "or_upper": 1.36637392279638,
+      "or_reverse": 1.03373344370861,
+      "or_reverse_lower": 0.731864084432633,
+      "or_reverse_upper": 1.46011377709575
+    }
+  ],
+  "tests": [
+    {
+      "test": "Wald (robust SE): period (with period:sex)",
+      "statistic": 48.6216599148574,
+      "df": 4,
+      "p_value": 7.00240273636589e-10,
+      "book_ref": "§9.2.4"
+    },
+    {
+      "test": "Wald (robust SE): sex (with period:sex)",
+      "statistic": 7.25071646417692,
+      "df": 3,
+      "p_value": 0.0643217141830967,
+      "book_ref": "§9.2.4"
+    },
+    {
+      "test": "Wald (robust SE): period:sex",
+      "statistic": 0.318207346693276,
+      "df": 2,
+      "p_value": 0.85290793056584,
+      "book_ref": "§9.2.4"
+    }
+  ],
+  "tables": {
+    "proportions": [
+      {
+        "time": "1",
+        "n": 649,
+        "successes": 492,
+        "proportion": 0.75808936825886
+      },
+      {
+        "time": "2",
+        "n": 649,
+        "successes": 504,
+        "proportion": 0.776579352850539
+      },
+      {
+        "time": "3",
+        "n": 649,
+        "successes": 549,
+        "proportion": 0.845916795069337
+      }
+    ]
+  },
+  "warnings": [],
+  "facts": ["資料沒有 id 欄，依列號產生 id（1–649），每一列視為一個叢集。", "把 G1、G2、G3 轉成長格式：G 欄為測量值，period 欄為時間（1 = G1、2 = G2、3 = G3），共 1947 列。", "新變數 passed 由 G 轉換：< 10 → fail；≥ 10 → pass。", "提醒：把連續的 G 切成類別會損失資訊，結論可能隨切點改變。", "共 649 個叢集、1947 筆觀察值；每個叢集的筆數：3 筆 649 個。", "叢集間變數（同一個叢集內不變）：sex；叢集內變數（同一個叢集內會變）：period。", "邊際 logistic 模型（GEE），成功 =「pass」，working correlation = exchangeable（估計相關 0.651）。", "period2：整體來說，勝算比 = 1.159（95% 信賴區間 0.949 到 1.415），P = 0.149。", "period3：整體來說，勝算比 = 1.786（95% 信賴區間 1.427 到 2.236），P < 0.001。", "sexM：整體來說，勝算比 = 0.671（95% 信賴區間 0.467 到 0.963），P = 0.030。", "period2:sexM：整體來說，勝算比 = 0.913（95% 信賴區間 0.660 到 1.263），P = 0.582。", "period3:sexM：整體來說，勝算比 = 0.967（95% 信賴區間 0.685 到 1.366），P = 0.851。", "Wald (robust SE): period (with period:sex) = 48.62（df = 4），P < 0.001。", "Wald (robust SE): sex (with period:sex) = 7.25（df = 3），P = 0.064。", "Wald (robust SE): period:sex = 0.32（df = 2），P = 0.853。"],
+  "notes": {
+    "effect_type": "population-averaged",
+    "corstr": "exchangeable",
+    "working_correlation": 0.650692467838526,
+    "clusters": {
+      "n_clusters": 649,
+      "n_obs": 1947,
+      "sizes": 649,
+      "n_singleton": 0
+    },
+    "cluster_level": {
+      "period": "within",
+      "sex": "between"
+    },
+    "predictors": {
+      "period": {
+        "type": "factor",
+        "ref": "1",
+        "levels": ["1", "2", "3"]
+      },
+      "sex": {
+        "type": "factor",
+        "ref": "F",
+        "levels": ["F", "M"]
+      }
+    },
+    "cluster_reminder": "GEE 的 robust SE 是大樣本方法，叢集少時傾向低估（§9.2.4）；本資料有 649 個叢集，課本沒有給門檻，請自行判斷是否足夠。",
+    "reminder": "勝算比是「整體平均」的效果；SE 為 robust（sandwich）SE，即使 working correlation 設錯也有效（§9.2.2）。"
+  },
+  "plots": "proportions.png",
+  "report": "分析報告_student_por_gee_binary.md"
+}

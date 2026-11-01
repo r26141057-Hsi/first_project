@@ -1,0 +1,1 @@
+{"question": "interaction check", "analysis": "compare_gee_glmm", "reshape": {"cols": ["G1","G2","G3"], "value": "G", "time": "period", "time_values": [1,2,3]}, "recode": {"passed": {"from": "G", "breaks": [10], "labels": ["fail","pass"]}}, "y": "passed", "time": "period", "x": ["sex"], "interactions": ["period:sex"], "success": "pass"}

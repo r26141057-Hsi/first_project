@@ -1,0 +1,1 @@
+{"question": "smoke test: schoolsup vs famsup", "structure": "paired", "analysis": "paired_binary", "y1": "schoolsup", "y2": "famsup", "success": "yes"}

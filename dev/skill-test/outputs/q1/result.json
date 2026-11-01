@@ -1,0 +1,123 @@
+{
+  "method": "paired_ordinal",
+  "method_label": "Cumulative logit marginal model for ordinal matched pairs",
+  "book_ref": "§8.4",
+  "tier": "A",
+  "estimates": [
+    {
+      "measure": "beta: cumulative logit, first vs second (logit P(Y <= j))",
+      "estimate": 1.37085,
+      "se": 0.07639,
+      "lower": 1.22112835122099,
+      "upper": 1.52057164877901,
+      "book_ref": "§8.4.1"
+    },
+    {
+      "measure": "Odds ratio: Dalc in a higher category vs Walc",
+      "estimate": 0.253891060407316,
+      "se": null,
+      "lower": 0.218586896297864,
+      "upper": 0.294897231474078,
+      "book_ref": "§8.4.1"
+    },
+    {
+      "measure": "Ordinal quasi-symmetry beta",
+      "estimate": 2.19233609396229,
+      "se": 0.208095168947166,
+      "lower": null,
+      "upper": null,
+      "book_ref": "§8.4.3"
+    },
+    {
+      "measure": "Mean score Dalc",
+      "estimate": 1.50231124807396,
+      "se": null,
+      "lower": null,
+      "upper": null,
+      "book_ref": "§8.4.3"
+    },
+    {
+      "measure": "Mean score Walc",
+      "estimate": 2.28043143297381,
+      "se": null,
+      "lower": null,
+      "upper": null,
+      "book_ref": "§8.4.3"
+    }
+  ],
+  "tests": [
+    {
+      "test": "Cumulative logit marginal model (GEE), Wald z^2",
+      "statistic": 322.037801193848,
+      "df": 1,
+      "p_value": 5.21228739312359e-72,
+      "book_ref": "§8.4.2"
+    },
+    {
+      "test": "Ordinal quasi-symmetry vs symmetry LR",
+      "statistic": 338.705459133344,
+      "df": 1,
+      "p_value": 1.2212374888356e-75,
+      "book_ref": "§8.4.3"
+    }
+  ],
+  "tables": {
+    "counts": {
+      "rows": ["1", "2", "3", "4", "5"],
+      "cols": ["1", "2", "3", "4", "5"],
+      "values": [
+        [241, 113, 64, 28, 5],
+        [3, 34, 43, 34, 7],
+        [1, 1, 9, 20, 12],
+        [1, 1, 4, 5, 6],
+        [1, 1, 0, 0, 15]
+      ]
+    },
+    "marginal": [
+      {
+        "category": "1",
+        "Dalc_count": 451,
+        "Dalc_prop": 0.694915254237288,
+        "Walc_count": 247,
+        "Walc_prop": 0.380585516178737
+      },
+      {
+        "category": "2",
+        "Dalc_count": 121,
+        "Dalc_prop": 0.186440677966102,
+        "Walc_count": 150,
+        "Walc_prop": 0.231124807395994
+      },
+      {
+        "category": "3",
+        "Dalc_count": 43,
+        "Dalc_prop": 0.0662557781201849,
+        "Walc_count": 120,
+        "Walc_prop": 0.184899845916795
+      },
+      {
+        "category": "4",
+        "Dalc_count": 17,
+        "Dalc_prop": 0.0261941448382126,
+        "Walc_count": 87,
+        "Walc_prop": 0.134052388289676
+      },
+      {
+        "category": "5",
+        "Dalc_count": 17,
+        "Dalc_prop": 0.0261941448382126,
+        "Walc_count": 45,
+        "Walc_prop": 0.0693374422187981
+      }
+    ]
+  },
+  "warnings": [],
+  "facts": ["共 649 人，每人兩次測量（Dalc、Walc），類別：1、2、3、4、5。", "累積 logit 邊際模型（GEE）：β̂ = 1.371（robust SE 0.076），Wald z = 17.95，P < 0.001。", "Dalc 落在較高類別的勝算是 Walc 的 0.254 倍（95% 信賴區間 0.219 到 0.295），對每個切點都相同（比例勝算）。", "方向：Dalc 傾向落在較低的類別（較接近「1」）。", "對照：有序準對稱模型 β̂ = 2.192，和對稱模型比較 LR = 338.71（df = 1），P < 0.001；平均分數 Dalc = 1.50、Walc = 2.28（分數 1, 2, 3, 4, 5）。"],
+  "notes": {
+    "scores": [1, 2, 3, 4, 5],
+    "levels": ["1", "2", "3", "4", "5"],
+    "reminder": "比例勝算：模型假設每個切點的效果相同（§8.4.1）。平均分數取決於分數設定，只用來幫助描述方向。"
+  },
+  "plots": ["square_table.png", "marginals.png"],
+  "report": "分析報告_student_por_paired_ordinal.md"
+}

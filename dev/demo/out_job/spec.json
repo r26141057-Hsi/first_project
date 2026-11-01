@@ -1,0 +1,1 @@
+{"question": "媽媽和爸爸的職業分布不同嗎？", "structure": "paired", "analysis": "paired_nominal", "y1": "Mjob", "y2": "Fjob"}

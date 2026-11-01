@@ -1,0 +1,92 @@
+{
+  "mode": "model",
+  "id": "id",
+  "y": "passed",
+  "time": "period",
+  "x": "sex",
+  "n_obs": 1947,
+  "n_dropped": 0,
+  "missing_share": 0,
+  "clusters": {
+    "n_clusters": 649,
+    "n_obs": 1947,
+    "sizes": 649,
+    "n_singleton": 0
+  },
+  "response_categories": {
+    "fail": 402,
+    "pass": 1545
+  },
+  "n_response_categories": 2,
+  "all_same_share": 0.818181818181818,
+  "cluster_level": {
+    "period": "within",
+    "sex": "between"
+  },
+  "warnings": [],
+  "success": "pass",
+  "smaller_outcome_count": 402,
+  "separation": false,
+  "facts": ["資料沒有 id 欄，依列號產生 id（1–649），每一列視為一個叢集。", "把 G1、G2、G3 轉成長格式：G 欄為測量值，period 欄為時間（1 = G1、2 = G2、3 = G3），共 1947 列。", "新變數 passed 由 G 轉換：< 10 → fail；≥ 10 → pass。", "提醒：把連續的 G 切成類別會損失資訊，結論可能隨切點改變。", "共 649 個叢集、1947 筆觀察值；每個叢集的筆數：3 筆 649 個。", "結果變數 passed 的次數：fail 402、pass 1545。", "有 81.8% 的叢集（≥ 2 筆）所有回答都相同。", "period 是叢集內（同一個叢集內會變）變數；sex 是叢集間（同一個叢集內不變）變數。"],
+  "plots": ["proportions.png", "proportions_by_group.png"],
+  "tables": {
+    "proportions": [
+      {
+        "time": "1",
+        "n": 649,
+        "successes": 492,
+        "proportion": 0.75808936825886
+      },
+      {
+        "time": "2",
+        "n": 649,
+        "successes": 504,
+        "proportion": 0.776579352850539
+      },
+      {
+        "time": "3",
+        "n": 649,
+        "successes": 549,
+        "proportion": 0.845916795069337
+      }
+    ],
+    "proportions_by_group": [
+      {
+        "time": "1",
+        "group": "F",
+        "n": 383,
+        "proportion": 0.788511749347259
+      },
+      {
+        "time": "2",
+        "group": "F",
+        "n": 383,
+        "proportion": 0.81201044386423
+      },
+      {
+        "time": "3",
+        "group": "F",
+        "n": 383,
+        "proportion": 0.869451697127937
+      },
+      {
+        "time": "1",
+        "group": "M",
+        "n": 266,
+        "proportion": 0.714285714285714
+      },
+      {
+        "time": "2",
+        "group": "M",
+        "n": 266,
+        "proportion": 0.725563909774436
+      },
+      {
+        "time": "3",
+        "group": "M",
+        "n": 266,
+        "proportion": 0.81203007518797
+      }
+    ]
+  }
+}

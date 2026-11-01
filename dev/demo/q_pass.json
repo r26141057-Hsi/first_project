@@ -1,0 +1,1 @@
+{"question": "三次考試的及格率有變化嗎？和性別有關嗎？", "mode": "model", "reshape": {"cols": ["G1","G2","G3"], "value": "G", "time": "period", "time_values": [1,2,3]}, "recode": {"passed": {"from": "G", "breaks": [10], "labels": ["fail","pass"]}}, "y": "passed", "time": "period", "x": ["sex"], "success": "pass"}

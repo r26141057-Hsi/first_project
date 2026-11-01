@@ -1,0 +1,225 @@
+---
+title: "categorical-correlated Skill 是怎麼做出來的"
+subtitle: "一個會先確認「資料是不是同一個人」、再分清楚兩種效果的類別資料 Claude Skill"
+lang: zh-Hant
+format:
+  html:
+    toc: true
+    toc-title: 目錄
+    embed-resources: true
+    code-copy: true
+    code-overflow: wrap
+    theme: cosmo
+execute:
+  warning: false
+  message: false
+---
+
+```{r}
+#| include: false
+suppressPackageStartupMessages(library(knitr))
+skill_dir <- "categorical-correlated"
+for (f in c("utils.R", setdiff(list.files(file.path(skill_dir, "R"), pattern = "\\.R$"), "utils.R")))
+  source(file.path(skill_dir, "R", f), encoding = "UTF-8")
+demo <- read_data("dev/demo/student_por.csv")
+prof <- cc_profile(demo)
+```
+
+## 這一頁要回答
+
+1. 為什麼需要一個專門處理「不獨立資料」的 Skill？
+2. Skill 怎麼運作、給了它哪些知識？
+3. 怎麼安裝、怎麼用？
+4. 我們怎麼確認它是對的？
+5. 開發過程中，AI 幫了什麼、我們決定了什麼？
+
+## 要解決什麼問題？
+
+組員的 Part 1（categorical-association）和 Part 2（categorical-modeling）都假設**每一列是不同、彼此獨立的個體**。遇到下面這些資料，兩個 Skill 都會停下來、轉介出去：
+
+- 同一位學生回答「平日」與「週末」喝酒程度（配對）
+- 同一位學生三次考試的成績（重複測量）
+- 同一所學校的學生（叢集）
+
+把這種資料當成獨立，**估計值不一定錯，但標準誤會錯**，P 值跟著錯（Agresti 第 8 章開頭、§9.2.3）。Part 3 就是接住這些被轉介的情況。
+
+更麻煩的是，這類資料有兩種模型，回答**不同的問題**：
+
+- **GEE**：整體來說，第三次考試的及格勝算是第一次的幾倍？
+- **GLMM**：對同一位學生，第三次的及格勝算是第一次的幾倍？
+
+同一份資料，兩者的數字可以差好幾倍（課本的例子差 5–6 倍）。一般使用者、甚至一般的 AI，很容易把兩者混在一起，或以為其中一個算錯。
+
+## 目標
+
+1. **先確認資料結構**：哪些列屬於同一個人，資料本身無法證明，一定要問使用者。
+2. **選對方法**：依「只比較兩次」還是「有解釋變數」、結果是二元／名目／有序、要哪一種效果，選課本第 8–10 章的方法。
+3. **數字都由程式算**，而且和課本一致。
+4. **說對話**：GEE 說「整體來說」、GLMM 說「對同一個人」，兩者不同時能解釋為什麼。
+5. **和組員的 Skill 接得起來**：同一份示範資料、同樣的流程與輸出格式。
+
+## Skill 是什麼？
+
+Claude Skill 是一個資料夾：`SKILL.md` 告訴 Claude 什麼時候用、怎麼做；`references/` 放需要時才讀的知識；`scripts/` 和 `R/` 是實際計算的程式。Claude 負責對話、判斷與解釋，**數字一律交給程式**。
+
+```
+categorical-correlated/
+├── SKILL.md                    流程、規則、用語
+├── references/
+│   ├── decision-tree.md        選方法的決策樹
+│   ├── checklist.md            注意事項清單（20 條、13 個警告代碼）
+│   ├── methods.md              每個方法的 R 程式碼（都用課本例子驗證過）
+│   └── textbook-methods.md     第 8–10 章的公式與觀念
+├── R/                          計算引擎（R 版，模式 1）
+└── scripts/                    各階段的腳本（R 與 Python 版）
+```
+
+## 怎麼運作？
+
+| 階段 | 做什麼 | 停下來？ |
+|---|---|---|
+| 1 資料總覽 | 變數型態、缺失、**資料可能不獨立的線索** | 停：問想回答什麼 |
+| 2 確認清單 | 一則訊息列出所有設定（附預設值與理由）與推薦的方法 | 停：等使用者回覆 |
+| 3 依問題畫圖 | 配對次數表、兩次的分布；或各時間點的比例 | 不停 |
+| 4 判斷適不適合 | 依注意事項清單標示 ✅／⚠️／❌ | 停：等使用者 OK |
+| 5 執行分析 | 程式計算、畫圖、產生報告 | |
+| 6 解釋結果 | 固定段落＋用語規則，補進報告檔 | |
+
+骨架沿用 Part 1 的「每個階段停下來」，階段 2 用 Part 2 的「一則訊息確認清單」。
+
+### 階段 1 會找什麼？
+
+程式會找出「可能不獨立」的線索，但**每一條都要使用者確認**。用示範資料 `student_por.csv` 跑一次（以下由程式產生）：
+
+```{r}
+h <- prof$structure$hints
+kable(data.frame(線索 = vapply(h, `[[`, "", "type"),
+                 欄位 = vapply(h, function(x) paste(x$columns, collapse = "、"), ""),
+                 要問使用者 = vapply(h, `[[`, "", "question")), caption = "student_por.csv 的階段 1 線索")
+```
+
+`Dalc`／`Walc`、`Mjob`／`Fjob` 的偵測規則是 Part 3 新加的：欄名只差第一個字母、類別也完全相同。
+
+## 給 Skill 的知識
+
+### 決策樹
+
+```{mermaid}
+flowchart TD
+  Q0{"同一個人（或同一群）<br/>有多筆資料嗎？"} -->|否| P12["轉介 Part 1 / Part 2"]
+  Q0 -->|是| Q2{"只比較兩次的分布？"}
+  Q2 -->|是| T{"結果的型態"}
+  T -->|二元| A1["McNemar §8.1"]
+  T -->|名目| A2["邊際同質性 §8.3"]
+  T -->|有序| A3["累積 logit 邊際模型 §8.4"]
+  Q2 -->|否| Q3{"要哪一種效果？"}
+  Q3 -->|整體平均| B1["GEE §9.2–9.3"]
+  Q3 -->|同一個人| B3["GLMM §10.1–10.2"]
+  Q3 -->|兩者| B4["並排 §10.1.4"]
+```
+
+### 注意事項清單（節錄）
+
+清單的原則和 Part 1 相同：**沒有列在清單上的狀況不要自己發明門檻**；課本沒有給數字的地方，Skill 也不給。
+
+| 狀況 | 標示 | 依據 |
+|---|---|---|
+| 使用者沒有確認資料不獨立 | 先問，不進行 | §1.1.3 |
+| 配對資料兩次的類別不同 | A 類方法 ❌ | §8.3 |
+| McNemar 的改變人數 ≤ 10 | ⚠️ 改用精確二項檢定 | §8.1.1 |
+| 有缺失 | ⚠️ GEE 需要 MCAR、GLMM 只需要 MAR | §9.5.1 |
+| 要 GEE 做概似比檢定 | ❌ GEE 沒有概似函數，用 Wald | §9.2.4 |
+| GLMM 增加積分點數後估計值改變 | ⚠️ 報告點數較多的結果 | §10.1.5 |
+| 檢定 σ = 0 | P 值取 χ²₁ 右尾的一半 | §10.1.6 |
+| GEE 的叢集數 | 只報告數字並提醒；課本沒有門檻，不自訂 | §9.2.4 |
+
+完整清單見 `references/checklist.md`。
+
+## 怎麼用？
+
+### 安裝
+
+**Claude Code（有 R，模式 1）**
+
+1. 安裝 R 與套件：`Rscript categorical-correlated/scripts/install_packages.R`（`jsonlite readr readxl ggplot2 scales PropCIs geepack multgee lme4`）。
+2. 把 `categorical-correlated` 資料夾複製到專案的 `.claude/skills/`，或個人的 `~/.claude/skills/`（Windows：`C:\Users\<帳號>\.claude\skills\`）。
+3. 在資料所在的資料夾開啟 Claude Code，直接用自然語言問，或指定「用 categorical-correlated skill」。
+
+Windows 上 `Rscript` 不在 PATH 時，Skill 會自己去找 `C:\Program Files\R\R-<版本>\bin\Rscript.exe`。
+
+**claude.ai 網頁版（沒有 R，模式 2）**
+
+在「設定 → 功能」開啟程式碼執行，再到「Skills」上傳 `categorical-correlated.zip`。Skill 會改用 Python 版（需要 `numpy pandas scipy statsmodels matplotlib`）：
+
+- Python 版是 R 版逐行對照改寫的，自動測試逐項比對兩邊的數字、警告與結論句，結果相同。
+- **Python 版不做 GLMM**（statsmodels 沒有和 R 相同的估計方法，數字會和課本對不上）。需要 GLMM 時，Skill 會把 `methods.md` 的 R 程式碼交給使用者在 RStudio 執行。
+
+### 跟著做：要貼給 Claude 的話
+
+每一題開一個新對話，上傳 `student_por.csv`：
+
+| 開場訊息 | Skill 停下來時回答 | 預期 |
+|---|---|---|
+| 請用 categorical-correlated skill 分析 student_por.csv：學生平日和週末的喝酒程度一樣嗎？ | Dalc、Walc 是同一位學生的平日、週末喝酒程度；1 < 2 < 3 < 4 < 5；其他照預設 → 用推薦的 | 有序配對；週末較高 |
+| 請用 categorical-correlated skill 分析 student_por.csv：媽媽和爸爸的職業分布不同嗎？ | Mjob、Fjob 是同一位學生的媽媽、爸爸職業；沒有順序；其他照預設 → 用推薦的 | 名目配對；媽媽較多「在家」 |
+| 請用 categorical-correlated skill 分析 student_por.csv：三次考試的及格率有變化嗎？和性別有關嗎？ | G1–G3 是同一位學生三次成績；10 分以上及格；我只想知道整體；其他照預設 → 用推薦的；再問「可以用概似比檢定比較 GEE 模型嗎？」 | GEE；說明 GEE 沒有概似函數 |
+| 請用 categorical-correlated skill 分析 student_por.csv：有沒有上付費補習，和想不想讀大學有關嗎？ | 每一列是不同的學生 | 轉介 Part 1 |
+
+## 合不合理？三層驗證
+
+| 層次 | 怎麼做 | 結果 |
+|---|---|---|
+| 1. 課本 | 從書中印出的表格重建 7 個例子（Table 8.1、8.5、8.6、9.1、9.2、10.1、罰球），每個方法的數字和課本比對（`dev/test_engine.R`） | 70 / 70 |
+| 2. Python 備案 | Python 版和課本比對、和 R 版逐項比對數字、警告、結論句（`dev/test_python.py`） | 57 / 57 |
+| 3. 真實資料 | 先寫人為判斷（`judgment.yml`），再在全新的 Claude 對話中實測；數字和不使用 Skill 程式的獨立驗證（`verify.R`）比對 | 方法 4 / 4、數字全部一致 |
+
+真實資料實測的詳細結果與比對表，見 Part 3 報告頁的「Skill 應用示範」。
+
+## 開發過程：AI 怎麼幫忙、我們怎麼決定
+
+<details>
+<summary>點開查看</summary>
+
+開發全程使用 Claude Code（Anthropic）輔助：讀課本、寫程式、跑測試、在新對話中實測。**方法的選擇與人為判斷由組員決定**；AI 提出的每個數字都要通過課本或獨立程式的比對。
+
+| 步驟 | 內容 | 誰決定 |
+|---|---|---|
+| 範圍 | 讀過組員兩份 Skill 後，確認 Part 3 = 第 8–10 章（兩份 Skill 都把配對、重複測量、叢集轉介出去） | 組員 |
+| 語言 | R 為主、Python 備案（和 Part 1 相同）；GLMM 只有 R 能和課本一致 | 組員 |
+| 知識 | 先寫 `references/`，每段 R 程式碼都跑課本例子驗證 | AI 寫、對照課本 |
+| 人為判斷 | `judgment.yml` 由組員依課本填寫，AI 只檢查格式與節號是否對得上 | 組員 |
+| 實測 | 兩輪新對話實測，發現問題後修正再測 | 組員回覆、AI 整理 |
+
+開發過程中發現、而且改掉的問題（這些也是我們學到的地方）：
+
+1. **積分點數**：課本墮胎例的個體差異很大（σ̂ = 8.75），GLMM 用 25 個積分點時 σ̂ 算成 9.34，要 100 點才和課本一致（§10.1.5 的警告真的會發生）。改成每次比較 50 點與 100 點。
+2. **「穩定」的判斷**：原本比較「四捨五入到小數第三位」的結果，2.85313 與 2.85359 就被誤判為不穩定；改成「差異超過 0.0005」。
+3. **課本的一句話**：§10.2.2 寫「P 值是右尾機率的一半，右尾機率為 0.21」，很容易誤讀成 P = 0.21；實際 P ≈ 0.11。
+4. **Python 版的 SE 差了 0.00007**：multgee 的 sandwich SE 用期望訊息矩陣（expected information），一開始用觀察訊息矩陣（observed）。改了之後完全一致。
+5. **實測時 Claude 自己取倒數**：程式只輸出「平日 vs 週末」的勝算比 0.254，Claude 為了回答「週末 vs 平日」自己算 1/0.254。改成程式直接輸出兩個方向。
+6. **加入交互作用後兩種檢定意義不同**：GLMM 拿掉主效果時連交互作用一起拿掉，GEE 沒有；實測中的 Claude 自己發現並說明了，我們把 GEE 改成一致。
+
+完整紀錄見 `dev/ai-log.csv`。
+
+</details>
+
+## 限制
+
+- GLMM 只做二元結果與隨機截距；有序結果的 GLMM、隨機斜率、多層模型（§10.3–10.4）沒有做。
+- Python 版不做 GLMM，也不做 `ar1`、`unstructured` 的 working correlation（估計方式和 R 不同）。
+- 比例勝算假設沒有正式檢定；缺失資料只提醒，不做多重插補。
+- 評分者一致性（Kappa，§8.5）、Bradley–Terry（§8.6）不在範圍內。
+
+## 參考文獻
+
+Agresti, A. (2019). *An Introduction to Categorical Data Analysis* (3rd ed.). Wiley.
+
+Cortez, P. (2008). Student Performance [Dataset]. UCI Machine Learning Repository. <https://doi.org/10.24432/C5TG7T>（CC BY 4.0）
+
+Bates, D., Mächler, M., Bolker, B., & Walker, S. (2015). Fitting linear mixed-effects models using lme4. *Journal of Statistical Software*, 67(1), 1–48.
+
+Halekoh, U., Højsgaard, S., & Yan, J. (2006). The R package geepack for generalized estimating equations. *Journal of Statistical Software*, 15(2), 1–11.
+
+Touloumis, A. (2015). R package multgee. *Journal of Statistical Software*, 64(8), 1–14.
+
+Seabold, S., & Perktold, J. (2010). statsmodels: Econometric and statistical modeling with Python. *Proceedings of the 9th Python in Science Conference*.

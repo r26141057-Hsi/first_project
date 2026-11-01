@@ -1,0 +1,67 @@
+{
+  "mode": "paired",
+  "y1": "Dalc",
+  "y2": "Walc",
+  "n_pairs": 649,
+  "n_dropped": 0,
+  "missing_share": 0,
+  "categories": ["1", "2", "3", "4", "5"],
+  "n_categories": 5,
+  "same_categories": true,
+  "diagonal_share": 0.468412942989214,
+  "warnings": [],
+  "empty_pairs": [],
+  "off_diagonal_min": 6,
+  "facts": ["共 649 人，每人兩次測量（Dalc、Walc），類別：1、2、3、4、5。", "兩次回答相同（對角線）的有 304 人（46.8%）。"],
+  "plots": ["square_table.png", "marginals.png"],
+  "tables": {
+    "counts": {
+      "rows": ["1", "2", "3", "4", "5"],
+      "cols": ["1", "2", "3", "4", "5"],
+      "values": [
+        [241, 113, 64, 28, 5],
+        [3, 34, 43, 34, 7],
+        [1, 1, 9, 20, 12],
+        [1, 1, 4, 5, 6],
+        [1, 1, 0, 0, 15]
+      ]
+    },
+    "marginal": [
+      {
+        "category": "1",
+        "Dalc_count": 451,
+        "Dalc_prop": 0.694915254237288,
+        "Walc_count": 247,
+        "Walc_prop": 0.380585516178737
+      },
+      {
+        "category": "2",
+        "Dalc_count": 121,
+        "Dalc_prop": 0.186440677966102,
+        "Walc_count": 150,
+        "Walc_prop": 0.231124807395994
+      },
+      {
+        "category": "3",
+        "Dalc_count": 43,
+        "Dalc_prop": 0.0662557781201849,
+        "Walc_count": 120,
+        "Walc_prop": 0.184899845916795
+      },
+      {
+        "category": "4",
+        "Dalc_count": 17,
+        "Dalc_prop": 0.0261941448382126,
+        "Walc_count": 87,
+        "Walc_prop": 0.134052388289676
+      },
+      {
+        "category": "5",
+        "Dalc_count": 17,
+        "Dalc_prop": 0.0261941448382126,
+        "Walc_count": 45,
+        "Walc_prop": 0.0693374422187981
+      }
+    ]
+  }
+}

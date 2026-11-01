@@ -1,0 +1,2 @@
+{"question": "媽媽和爸爸的職業分布不同嗎？", "mode": "paired",
+ "y1": "Mjob", "y2": "Fjob", "levels": ["at_home", "health", "other", "services", "teacher"]}

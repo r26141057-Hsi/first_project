@@ -1,0 +1,6 @@
+{"question": "三次考試的及格率有變化嗎？和性別有關嗎？", "structure": "repeated", "method_id": "compare_gee_glmm",
+ "reason": "同一位學生三次考試的二元結果，時間是叢集內變數、性別是叢集間變數，GEE 與 GLMM 並排（§9.2、§10.2）",
+ "analysis": "compare_gee_glmm",
+ "reshape": {"cols": ["G1", "G2", "G3"], "value": "G", "time": "period", "time_values": [1, 2, 3]},
+ "recode": {"passed": {"from": "G", "breaks": [10], "labels": ["fail", "pass"]}},
+ "y": "passed", "time": "period", "x": ["sex"], "success": "pass", "corstr": "exchangeable"}

@@ -1,0 +1,395 @@
+{
+  "method": "compare_gee_glmm",
+  "method_label": "GEE (population-averaged) vs GLMM (subject-specific)",
+  "book_ref": "§10.1.4, §10.2.5",
+  "tier": "A",
+  "estimates": [
+    {
+      "term": "(Intercept)",
+      "gee_estimate": 1.31597786270244,
+      "gee_se": 0.125127683949204,
+      "glmm_estimate": 4.15846284355711,
+      "glmm_se": 0.503489583927765,
+      "ratio": 3.15997932899682,
+      "gee_or": 3.72839506172842,
+      "glmm_or": 63.9731103030925,
+      "gee_or_reverse": 0.2682119205298,
+      "glmm_or_reverse": 0.0156315676268074
+    },
+    {
+      "term": "period2",
+      "gee_estimate": 0.147148930460746,
+      "gee_se": 0.101919646505725,
+      "glmm_estimate": 0.464255715784627,
+      "glmm_se": 0.323831953008304,
+      "ratio": 3.15500570973211,
+      "gee_or": 1.15852649006622,
+      "glmm_or": 1.59082971870157,
+      "gee_or_reverse": 0.86316541622008,
+      "glmm_or_reverse": 0.628602790257272
+    },
+    {
+      "term": "period3",
+      "gee_estimate": 0.580141621849866,
+      "gee_se": 0.114640410667761,
+      "glmm_estimate": 1.79919221415168,
+      "glmm_se": 0.377906059732001,
+      "ratio": 3.10129828026249,
+      "gee_or": 1.78629139072848,
+      "glmm_or": 6.04476261802439,
+      "gee_or_reverse": 0.559819078337597,
+      "glmm_or_reverse": 0.165432468269007
+    },
+    {
+      "term": "sexM",
+      "gee_estimate": -0.399687130828283,
+      "gee_se": 0.184602247879246,
+      "glmm_estimate": -1.28950448508848,
+      "glmm_se": 0.568865041142158,
+      "ratio": 3.22628472529552,
+      "gee_or": 0.670529801324498,
+      "glmm_or": 0.27540721766737,
+      "gee_or_reverse": 1.49135802469137,
+      "glmm_or_reverse": 3.6309869017586
+    },
+    {
+      "term": "period2:sexM",
+      "gee_estimate": -0.0912089145784062,
+      "gee_se": 0.165582338292058,
+      "glmm_estimate": -0.303310425389831,
+      "glmm_se": 0.46030413275902,
+      "ratio": 3.32544715384257,
+      "gee_or": 0.912826988112195,
+      "glmm_or": 0.738369852041534,
+      "gee_or_reverse": 1.09549784682428,
+      "glmm_or_reverse": 1.35433481910872
+    },
+    {
+      "term": "period3:sexM",
+      "gee_estimate": -0.0331769514680018,
+      "gee_se": 0.176195794135767,
+      "glmm_estimate": -0.257903216879745,
+      "glmm_se": 0.510643129918103,
+      "ratio": 7.77356584822102,
+      "gee_or": 0.967367367367369,
+      "glmm_or": 0.772670009902741,
+      "gee_or_reverse": 1.03373344370861,
+      "glmm_or_reverse": 1.29421355453653
+    }
+  ],
+  "tests": [
+    {
+      "test": "Wald (robust SE): period (with period:sex)",
+      "statistic": 48.6216599148574,
+      "df": 4,
+      "p_value": 7.00240273636589e-10,
+      "book_ref": "§9.2.4"
+    },
+    {
+      "test": "Wald (robust SE): sex (with period:sex)",
+      "statistic": 7.25071646417692,
+      "df": 3,
+      "p_value": 0.0643217141830967,
+      "book_ref": "§9.2.4"
+    },
+    {
+      "test": "Wald (robust SE): period:sex",
+      "statistic": 0.318207346693276,
+      "df": 2,
+      "p_value": 0.85290793056584,
+      "book_ref": "§9.2.4"
+    },
+    {
+      "test": "Likelihood-ratio: period (with period:sex)",
+      "statistic": 50.0440460740112,
+      "df": 4,
+      "p_value": 3.5352043747099e-10,
+      "book_ref": "§10.1.6"
+    },
+    {
+      "test": "Likelihood-ratio: sex (with period:sex)",
+      "statistic": 8.92361096301011,
+      "df": 3,
+      "p_value": 0.0303239516615879,
+      "book_ref": "§10.1.6"
+    },
+    {
+      "test": "Likelihood-ratio: period:sex",
+      "statistic": 0.488632917760242,
+      "df": 2,
+      "p_value": 0.783239731871061,
+      "book_ref": "§10.1.6"
+    },
+    {
+      "test": "Random effect sigma = 0 (LR, half chi-squared)",
+      "statistic": 527.112390360976,
+      "df": 1,
+      "p_value": 5.9998055329363e-117,
+      "book_ref": "§10.1.6"
+    }
+  ],
+  "tables": {
+    "proportions": [
+      {
+        "time": "1",
+        "n": 649,
+        "successes": 492,
+        "proportion": 0.75808936825886
+      },
+      {
+        "time": "2",
+        "n": 649,
+        "successes": 504,
+        "proportion": 0.776579352850539
+      },
+      {
+        "time": "3",
+        "n": 649,
+        "successes": 549,
+        "proportion": 0.845916795069337
+      }
+    ]
+  },
+  "warnings": [
+    {
+      "code": "QUADRATURE_UNSTABLE",
+      "message": "用 50 點和 100 點配適的估計值差異超過 0.0005（σ̂：4.842 vs 4.857），數值積分可能還沒穩定；以下報告 100 點的結果。",
+      "book_ref": "§10.1.5"
+    },
+    {
+      "code": "ALL_SAME_RESPONSE",
+      "message": "有 81.8% 的叢集所有回答都相同，σ̂ = 4.857：叢集之間差異越大，GLMM（同一個叢集）的效果就比 GEE（整體平均）大越多，SE 也一樣變大。這不是錯誤。",
+      "book_ref": "§10.1.4、§10.2.3"
+    }
+  ],
+  "facts": ["資料沒有 id 欄，依列號產生 id（1–649），每一列視為一個叢集。", "把 G1、G2、G3 轉成長格式：G 欄為測量值，period 欄為時間（1 = G1、2 = G2、3 = G3），共 1947 列。", "新變數 passed 由 G 轉換：< 10 → fail；≥ 10 → pass。", "提醒：把連續的 G 切成類別會損失資訊，結論可能隨切點改變。", "同一份資料（649 個叢集、1947 筆）分別配適 GEE（整體平均）與 GLMM（同一個叢集）。", "period2：GEE 估計 0.147（SE 0.102）、GLMM 估計 0.464（SE 0.324），GLMM / GEE = 3.16。", "period3：GEE 估計 0.580（SE 0.115）、GLMM 估計 1.799（SE 0.378），GLMM / GEE = 3.10。", "sexM：GEE 估計 -0.400（SE 0.185）、GLMM 估計 -1.290（SE 0.569），GLMM / GEE = 3.23。", "period2:sexM：GEE 估計 -0.091（SE 0.166）、GLMM 估計 -0.303（SE 0.460），GLMM / GEE = 3.33。", "period3:sexM：GEE 估計 -0.033（SE 0.176）、GLMM 估計 -0.258（SE 0.511），GLMM / GEE = 7.77。", "GLMM 的隨機效果標準差 σ̂ = 4.857；GEE 的 working correlation 估計 = 0.651。", "兩者回答不同的問題：GEE 是母體中隨機抽的人的平均效果，GLMM 是固定同一個叢集時的效果；邏輯連結下，σ 越大，整體平均的效果越接近 0（§10.1.4）。"],
+  "notes": {
+    "gee": {
+      "estimates": [
+        {
+          "term": "(Intercept)",
+          "estimate": 1.31597786270244,
+          "se": 0.125127683949204,
+          "z": 10.5170800031483,
+          "p_value": 7.20726454525254e-26,
+          "odds_ratio": 3.72839506172842,
+          "or_lower": 2.9175146561404,
+          "or_upper": 4.76464778233899,
+          "or_reverse": 0.2682119205298,
+          "or_reverse_lower": 0.209879102439991,
+          "or_reverse_upper": 0.342757489802264
+        },
+        {
+          "term": "period2",
+          "estimate": 0.147148930460746,
+          "se": 0.101919646505725,
+          "z": 1.44377394845537,
+          "p_value": 0.148802572378672,
+          "odds_ratio": 1.15852649006622,
+          "or_lower": 0.9487500419962,
+          "or_upper": 1.41468623849667,
+          "or_reverse": 0.86316541622008,
+          "or_reverse_lower": 0.706870522090227,
+          "or_reverse_upper": 1.05401839866691
+        },
+        {
+          "term": "period3",
+          "estimate": 0.580141621849866,
+          "se": 0.114640410667761,
+          "z": 5.06053335355864,
+          "p_value": 4.18085312615909e-07,
+          "odds_ratio": 1.78629139072848,
+          "or_lower": 1.42682335871293,
+          "or_upper": 2.23632232617006,
+          "or_reverse": 0.559819078337597,
+          "or_reverse_lower": 0.447162731551585,
+          "or_reverse_upper": 0.700857603636414
+        },
+        {
+          "term": "sexM",
+          "estimate": -0.399687130828283,
+          "se": 0.184602247879246,
+          "z": -2.1651260232201,
+          "p_value": 0.0303780355809437,
+          "odds_ratio": 0.670529801324498,
+          "or_lower": 0.466965038502169,
+          "or_upper": 0.962834853560847,
+          "or_reverse": 1.49135802469137,
+          "or_reverse_lower": 1.03859971032593,
+          "or_reverse_upper": 2.14148794352482
+        },
+        {
+          "term": "period2:sexM",
+          "estimate": -0.0912089145784062,
+          "se": 0.165582338292058,
+          "z": -0.550837218022188,
+          "p_value": 0.581745268280979,
+          "odds_ratio": 0.912826988112195,
+          "or_lower": 0.659848949791844,
+          "or_upper": 1.26279372042471,
+          "or_reverse": 1.09549784682428,
+          "or_reverse_lower": 0.791894973680795,
+          "or_reverse_upper": 1.51549835809462
+        },
+        {
+          "term": "period3:sexM",
+          "estimate": -0.0331769514680018,
+          "se": 0.176195794135767,
+          "z": -0.188295933116528,
+          "p_value": 0.850644673239042,
+          "odds_ratio": 0.967367367367369,
+          "or_lower": 0.684878134626641,
+          "or_upper": 1.36637392279638,
+          "or_reverse": 1.03373344370861,
+          "or_reverse_lower": 0.731864084432633,
+          "or_reverse_upper": 1.46011377709575
+        }
+      ],
+      "facts": ["共 649 個叢集、1947 筆觀察值；每個叢集的筆數：3 筆 649 個。", "叢集間變數（同一個叢集內不變）：sex；叢集內變數（同一個叢集內會變）：period。", "邊際 logistic 模型（GEE），成功 =「pass」，working correlation = exchangeable（估計相關 0.651）。", "period2：整體來說，勝算比 = 1.159（95% 信賴區間 0.949 到 1.415），P = 0.149。", "period3：整體來說，勝算比 = 1.786（95% 信賴區間 1.427 到 2.236），P < 0.001。", "sexM：整體來說，勝算比 = 0.671（95% 信賴區間 0.467 到 0.963），P = 0.030。", "period2:sexM：整體來說，勝算比 = 0.913（95% 信賴區間 0.660 到 1.263），P = 0.582。", "period3:sexM：整體來說，勝算比 = 0.967（95% 信賴區間 0.685 到 1.366），P = 0.851。", "Wald (robust SE): period (with period:sex) = 48.62（df = 4），P < 0.001。", "Wald (robust SE): sex (with period:sex) = 7.25（df = 3），P = 0.064。", "Wald (robust SE): period:sex = 0.32（df = 2），P = 0.853。"],
+      "notes": {
+        "effect_type": "population-averaged",
+        "corstr": "exchangeable",
+        "working_correlation": 0.650692467838526,
+        "clusters": {
+          "n_clusters": 649,
+          "n_obs": 1947,
+          "sizes": 649,
+          "n_singleton": 0
+        },
+        "cluster_level": {
+          "period": "within",
+          "sex": "between"
+        },
+        "predictors": {
+          "period": {
+            "type": "factor",
+            "ref": "1",
+            "levels": ["1", "2", "3"]
+          },
+          "sex": {
+            "type": "factor",
+            "ref": "F",
+            "levels": ["F", "M"]
+          }
+        },
+        "cluster_reminder": "GEE 的 robust SE 是大樣本方法，叢集少時傾向低估（§9.2.4）；本資料有 649 個叢集，課本沒有給門檻，請自行判斷是否足夠。",
+        "reminder": "勝算比是「整體平均」的效果；SE 為 robust（sandwich）SE，即使 working correlation 設錯也有效（§9.2.2）。"
+      }
+    },
+    "glmm": {
+      "estimates": [
+        {
+          "term": "(Intercept)",
+          "estimate": 4.15846284355711,
+          "se": 0.503489583927765,
+          "z": 8.25928276632178,
+          "p_value": 1.46550383084746e-16,
+          "odds_ratio": 63.9731103030925,
+          "or_lower": 23.8465938701747,
+          "or_upper": 171.620268459818,
+          "or_reverse": 0.0156315676268074,
+          "or_reverse_lower": 0.00582681759546444,
+          "or_reverse_upper": 0.0419347100656884
+        },
+        {
+          "term": "period2",
+          "estimate": 0.464255715784627,
+          "se": 0.323831953008304,
+          "z": 1.43363158413439,
+          "p_value": 0.151677425390955,
+          "odds_ratio": 1.59082971870157,
+          "or_lower": 0.843290945744486,
+          "or_upper": 3.00102735203673,
+          "or_reverse": 0.628602790257272,
+          "or_reverse_lower": 0.333219222184471,
+          "or_reverse_upper": 1.18583035314955
+        },
+        {
+          "term": "period3",
+          "estimate": 1.79919221415168,
+          "se": 0.377906059732001,
+          "z": 4.76095095015839,
+          "p_value": 1.92682878571418e-06,
+          "odds_ratio": 6.04476261802439,
+          "or_lower": 2.88207334771861,
+          "or_upper": 12.6780795281247,
+          "or_reverse": 0.165432468269007,
+          "or_reverse_lower": 0.0788762996620763,
+          "or_reverse_upper": 0.346972432464836
+        },
+        {
+          "term": "sexM",
+          "estimate": -1.28950448508848,
+          "se": 0.568865041142158,
+          "z": -2.26680212673895,
+          "p_value": 0.0234023161594861,
+          "odds_ratio": 0.27540721766737,
+          "or_lower": 0.0903142993034188,
+          "or_upper": 0.839835287748404,
+          "or_reverse": 3.6309869017586,
+          "or_reverse_lower": 1.19070967198937,
+          "or_reverse_upper": 11.0724437626473
+        },
+        {
+          "term": "period2:sexM",
+          "estimate": -0.303310425389831,
+          "se": 0.46030413275902,
+          "z": -0.658934829830478,
+          "p_value": 0.509937618645892,
+          "odds_ratio": 0.738369852041534,
+          "or_lower": 0.299545202122035,
+          "or_upper": 1.82005932507551,
+          "or_reverse": 1.35433481910872,
+          "or_reverse_lower": 0.549432640036893,
+          "or_reverse_upper": 3.33839431550167
+        },
+        {
+          "term": "period3:sexM",
+          "estimate": -0.257903216879745,
+          "se": 0.510643129918103,
+          "z": -0.505055687170623,
+          "p_value": 0.613519723877938,
+          "odds_ratio": 0.772670009902741,
+          "or_lower": 0.284010133399867,
+          "or_upper": 2.10210437584119,
+          "or_reverse": 1.29421355453653,
+          "or_reverse_lower": 0.475713771158405,
+          "or_reverse_upper": 3.52100112777338
+        }
+      ],
+      "facts": ["共 649 個叢集、1947 筆觀察值；每個叢集的筆數：3 筆 649 個。", "叢集間變數（同一個叢集內不變）：sex；叢集內變數（同一個叢集內會變）：period。", "隨機截距 logistic 模型（GLMM），成功 =「pass」，adaptive Gauss–Hermite 100 點。", "隨機效果標準差 σ̂ = 4.857：叢集之間的差異越大，同一叢集內的回答越相像。σ = 0 的檢定 LR = 527.11，P < 0.001（χ²₁ 右尾的一半）。", "有 81.8% 的叢集（≥ 2 筆）所有回答都相同。", "period2：對同一個叢集（隨機效果相同時），勝算比 = 1.591（95% 信賴區間 0.843 到 3.001），Wald P = 0.152。", "period3：對同一個叢集（隨機效果相同時），勝算比 = 6.045（95% 信賴區間 2.882 到 12.678），Wald P < 0.001。", "sexM：對同一個叢集（隨機效果相同時），勝算比 = 0.275（95% 信賴區間 0.090 到 0.840），Wald P = 0.023。", "period2:sexM：對同一個叢集（隨機效果相同時），勝算比 = 0.738（95% 信賴區間 0.300 到 1.820），Wald P = 0.510。", "period3:sexM：對同一個叢集（隨機效果相同時），勝算比 = 0.773（95% 信賴區間 0.284 到 2.102），Wald P = 0.614。", "Likelihood-ratio: period (with period:sex) = 50.04（df = 4），P < 0.001。", "Likelihood-ratio: sex (with period:sex) = 8.92（df = 3），P = 0.030。", "Likelihood-ratio: period:sex = 0.49（df = 2），P = 0.783。"],
+      "notes": {
+        "effect_type": "subject-specific",
+        "sigma": 4.85709247957642,
+        "all_same_share": 0.818181818181818,
+        "nAGQ": 100,
+        "clusters": {
+          "n_clusters": 649,
+          "n_obs": 1947,
+          "sizes": 649,
+          "n_singleton": 0
+        },
+        "cluster_level": {
+          "period": "within",
+          "sex": "between"
+        },
+        "predictors": {
+          "period": {
+            "type": "factor",
+            "ref": "1",
+            "levels": ["1", "2", "3"]
+          },
+          "sex": {
+            "type": "factor",
+            "ref": "F",
+            "levels": ["F", "M"]
+          }
+        },
+        "reminder": "勝算比是「同一個叢集內」的效果（隨機效果固定時），不是整體平均（§10.1.4）。"
+      }
+    },
+    "reminder": "兩個模型的數字不同不代表其中一個算錯；結論通常相同（§10.2.3）。"
+  },
+  "plots": ["proportions.png", "compare.png"],
+  "report": "分析報告_student_por_compare_gee_glmm.md"
+}

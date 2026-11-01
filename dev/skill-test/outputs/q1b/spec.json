@@ -1,0 +1,11 @@
+{
+  "question": "學生平日和週末的喝酒程度一樣嗎？",
+  "structure": "paired",
+  "types": {"Dalc": "ordinal", "Walc": "ordinal"},
+  "method_id": "paired_ordinal",
+  "reason": "同一位學生平日（Dalc）與週末（Walc）的有序回答（1 < 2 < 3 < 4 < 5），只比較兩次的邊際分布；有序方法 df = 1、檢定力較高（§8.4）",
+  "analysis": "paired_ordinal",
+  "y1": "Dalc", "y2": "Walc",
+  "levels": ["1", "2", "3", "4", "5"],
+  "conf_level": 0.95
+}

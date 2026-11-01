@@ -1,0 +1,72 @@
+# Part 3 真實資料實測：研究問題與「人為判斷」
+#
+# 請組員依課本自己判斷並填寫每一題的 judgment（Claude 不可代填，同 Part 1、Part 2 的規則）。
+# 填完後才開始用新對話實測 skill，最後把這裡的判斷和 skill 的判斷並排比較。
+#
+# 可填的值：
+#   structure:  independent（獨立）、matched_pairs（配對）、repeated_measures（重複測量）、clustered（叢集）
+#   type:       binary（二元）、nominal（名目）、ordinal（有序）、continuous（連續）、count（計數）
+#   effect:     （只有模型題要填）population_averaged（整體平均）、subject_specific（同一個人）、both（兩者）
+#   method_id:  Part 3 的方法代號：
+#               paired_binary（McNemar）、paired_nominal（名目配對的邊際同質性）、
+#               paired_ordinal（有序配對的累積 logit 邊際模型）、
+#               gee_binary、gee_ordinal、gee_nominal（GEE 邊際模型）、
+#               glmm_binary（隨機截距 logistic）、compare_gee_glmm（GEE 與 GLMM 並排）；
+#               也可以填其他 Part 的方法（例如 Part 1 的 crosstab），或 refer（轉介）
+#   method:     用自己的話描述方法
+#   book_ref:   依據的課本節號，例如 §8.4
+#   reason:     為什麼選這個方法（一兩句話）
+
+data: student_por.csv   # UCI 葡萄牙高中生資料（葡萄牙文課），649 位學生、一人一列
+
+# 判斷紀錄（1101）：由 __test1____ 決定。
+
+questions:
+  - id: q1
+    question: 學生平日和週末的喝酒程度一樣嗎？
+    variables: {measure_1: Dalc, measure_2: Walc}
+    data_note: Dalc、Walc 是同一位學生回答的平日、週末喝酒程度（1 很少 – 5 很多）
+    judgment:
+      structure: matched_pairs
+      outcome_type: ordinal
+      method_id: paired_ordinal
+      method:
+      book_ref: §8.4.1–8.4.2
+      reason: 同一人的兩個回答
+
+  - id: q2
+    question: 媽媽和爸爸的職業分布不同嗎？
+    variables: {measure_1: Mjob, measure_2: Fjob}
+    data_note: Mjob、Fjob 是同一位學生的媽媽、爸爸的職業（teacher、health、services、at_home、other）
+    judgment:
+      structure: matched_pairs
+      outcome_type: nominal
+      method_id: paired_nominal
+      method:
+      book_ref: §8.3
+      reason: 成對的多維比較
+
+  - id: q3
+    question: 三次考試的及格率有變化嗎？和性別有關嗎？
+    variables: {measures: [G1, G2, G3], explanatory: sex}
+    data_note: G1、G2、G3 是同一位學生第 1、2 期與期末的成績（0–20），及格 = 10 分以上
+    judgment:
+      structure: repeated_measures
+      outcome_type: binary
+      effect: population_averaged
+      method_id: gee_binary
+      method:
+      book_ref: §9.1–9.2
+      reason: 同一人的前後比較
+
+  - id: q4
+    question: 有沒有上付費補習，和想不想讀大學有關嗎？
+    variables: {outcome: higher, explanatory: paid}
+    data_note: 每位學生一列；paid、higher 都是 yes/no
+    judgment:
+      structure: independent
+      outcome_type: binary
+      method_id: crosstab
+      method:
+      book_ref: §2.1–2.4
+      reason: 學生之間互不影響考慮獨立

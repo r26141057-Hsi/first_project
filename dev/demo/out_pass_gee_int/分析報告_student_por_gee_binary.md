@@ -1,0 +1,58 @@
+# 分析報告：Marginal logistic model fitted by GEE
+
+- 資料檔：`student_por.csv`
+- 方法：Marginal logistic model fitted by GEE（Agresti §9.2）
+- 效果的意義：整體平均（population-averaged）
+
+## 描述統計
+
+| time | n | successes | proportion |
+|---|---|---|---|
+| 1 | 649 | 492 | 0.7581 |
+| 2 | 649 | 504 | 0.7766 |
+| 3 | 649 | 549 | 0.8459 |
+
+## 結果
+
+- 資料沒有 id 欄，依列號產生 id（1–649），每一列視為一個叢集。
+- 把 G1、G2、G3 轉成長格式：G 欄為測量值，period 欄為時間（1 = G1、2 = G2、3 = G3），共 1947 列。
+- 新變數 passed 由 G 轉換：< 10 → fail；≥ 10 → pass。
+- 提醒：把連續的 G 切成類別會損失資訊，結論可能隨切點改變。
+- 共 649 個叢集、1947 筆觀察值；每個叢集的筆數：3 筆 649 個。
+- 叢集間變數（同一個叢集內不變）：sex；叢集內變數（同一個叢集內會變）：period。
+- 邊際 logistic 模型（GEE），成功 =「pass」，working correlation = exchangeable（估計相關 0.651）。
+- period2：整體來說，勝算比 = 1.159（95% 信賴區間 0.949 到 1.415），P = 0.149。
+- period3：整體來說，勝算比 = 1.786（95% 信賴區間 1.427 到 2.236），P < 0.001。
+- sexM：整體來說，勝算比 = 0.671（95% 信賴區間 0.467 到 0.963），P = 0.030。
+- period2:sexM：整體來說，勝算比 = 0.913（95% 信賴區間 0.660 到 1.263），P = 0.582。
+- period3:sexM：整體來說，勝算比 = 0.967（95% 信賴區間 0.685 到 1.366），P = 0.851。
+- Wald (robust SE): period (with period:sex) = 48.62（df = 4），P < 0.001。
+- Wald (robust SE): sex (with period:sex) = 7.25（df = 3），P = 0.064。
+- Wald (robust SE): period:sex = 0.32（df = 2），P = 0.853。
+
+## 檢定
+
+| test | statistic | df | p_value | book_ref |
+|---|---|---|---|---|
+| Wald (robust SE): period (with period:sex) | 48.6217 | 4 | 7.002e-10 | §9.2.4 |
+| Wald (robust SE): sex (with period:sex) | 7.2507 | 3 | 0.0643 | §9.2.4 |
+| Wald (robust SE): period:sex | 0.3182 | 2 | 0.8529 | §9.2.4 |
+
+## 估計值
+
+| term | estimate | se | z | p_value | odds_ratio | or_lower | or_upper | or_reverse | or_reverse_lower | or_reverse_upper |
+|---|---|---|---|---|---|---|---|---|---|---|
+| (Intercept) | 1.3160 | 0.1251 | 10.5171 | 7.207e-26 | 3.7284 | 2.9175 | 4.7646 | 0.2682 | 0.2099 | 0.3428 |
+| period2 | 0.1471 | 0.1019 | 1.4438 | 0.1488 | 1.1585 | 0.9488 | 1.4147 | 0.8632 | 0.7069 | 1.0540 |
+| period3 | 0.5801 | 0.1146 | 5.0605 | 4.181e-07 | 1.7863 | 1.4268 | 2.2363 | 0.5598 | 0.4472 | 0.7009 |
+| sexM | -0.3997 | 0.1846 | -2.1651 | 0.0304 | 0.6705 | 0.4670 | 0.9628 | 1.4914 | 1.0386 | 2.1415 |
+| period2:sexM | -0.0912 | 0.1656 | -0.5508 | 0.5817 | 0.9128 | 0.6598 | 1.2628 | 1.0955 | 0.7919 | 1.5155 |
+| period3:sexM | -0.0332 | 0.1762 | -0.1883 | 0.8506 | 0.9674 | 0.6849 | 1.3664 | 1.0337 | 0.7319 | 1.4601 |
+
+> GEE 的 robust SE 是大樣本方法，叢集少時傾向低估（§9.2.4）；本資料有 649 個叢集，課本沒有給門檻，請自行判斷是否足夠。
+
+## 圖
+
+![](proportions.png)
+
+> 勝算比是「整體平均」的效果；SE 為 robust（sandwich）SE，即使 working correlation 設錯也有效（§9.2.2）。

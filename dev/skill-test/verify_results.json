@@ -1,0 +1,66 @@
+{
+  "q1": {
+    "beta": 1.37085,
+    "robust_se": 0.07639,
+    "or_dalc_higher": 0.253891,
+    "mean_dalc": 1.502311,
+    "mean_walc": 2.280431
+  },
+  "q2": {
+    "lr": 108.45439,
+    "df": 4,
+    "cmh": 99.795385,
+    "prop_mother": {
+      "at_home": 0.208,
+      "health": 0.074,
+      "other": 0.3975,
+      "services": 0.2096,
+      "teacher": 0.1109
+    },
+    "prop_father": {
+      "at_home": 0.0647,
+      "health": 0.0354,
+      "other": 0.5655,
+      "services": 0.2789,
+      "teacher": 0.0555
+    }
+  },
+  "q3": {
+    "prop_by_period": {
+      "1": 0.7581,
+      "2": 0.7766,
+      "3": 0.8459
+    },
+    "gee": {
+      "coef": {
+        "(Intercept)": 1.334831,
+        "period2": 0.104509,
+        "period3": 0.564976,
+        "sexM": -0.440625
+      },
+      "robust_se": {
+        "(Intercept)": 0.123233,
+        "period2": 0.081625,
+        "period3": 0.08753,
+        "sexM": 0.167458
+      },
+      "alpha": 0.650541
+    },
+    "glmm": {
+      "coef": {
+        "(Intercept)": 4.230752,
+        "period2": 0.314982,
+        "period3": 1.668921,
+        "sexM": -1.456611
+      },
+      "se": {
+        "(Intercept)": 0.493601,
+        "period2": 0.230208,
+        "period3": 0.270395,
+        "sexM": 0.515119
+      },
+      "sigma": 4.843798
+    },
+    "all_same_share": 0.818182
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "mode": "paired",
+  "y1": "Mjob",
+  "y2": "Fjob",
+  "n_pairs": 649,
+  "n_dropped": 0,
+  "missing_share": 0,
+  "categories": ["at_home", "health", "other", "services", "teacher"],
+  "n_categories": 5,
+  "same_categories": true,
+  "diagonal_share": 0.439137134052388,
+  "warnings": [],
+  "empty_pairs": [],
+  "off_diagonal_min": 3,
+  "facts": ["共 649 人，每人兩次測量（Mjob、Fjob），類別：at_home、health、other、services、teacher。", "兩次回答相同（對角線）的有 285 人（43.9%）。"],
+  "plots": ["square_table.png", "marginals.png"],
+  "tables": {
+    "counts": {
+      "rows": ["at_home", "health", "other", "services", "teacher"],
+      "cols": ["at_home", "health", "other", "services", "teacher"],
+      "values": [
+        [18, 2, 77, 36, 2],
+        [1, 9, 21, 15, 2],
+        [14, 3, 183, 50, 8],
+        [7, 4, 58, 59, 8],
+        [2, 5, 28, 21, 16]
+      ]
+    },
+    "marginal": [
+      {
+        "category": "at_home",
+        "Mjob_count": 135,
+        "Mjob_prop": 0.208012326656394,
+        "Fjob_count": 42,
+        "Fjob_prop": 0.0647149460708783
+      },
+      {
+        "category": "health",
+        "Mjob_count": 48,
+        "Mjob_prop": 0.073959938366718,
+        "Fjob_count": 23,
+        "Fjob_prop": 0.0354391371340524
+      },
+      {
+        "category": "other",
+        "Mjob_count": 258,
+        "Mjob_prop": 0.397534668721109,
+        "Fjob_count": 367,
+        "Fjob_prop": 0.565485362095532
+      },
+      {
+        "category": "services",
+        "Mjob_count": 136,
+        "Mjob_prop": 0.209553158705701,
+        "Fjob_count": 181,
+        "Fjob_prop": 0.278890600924499
+      },
+      {
+        "category": "teacher",
+        "Mjob_count": 72,
+        "Mjob_prop": 0.110939907550077,
+        "Fjob_count": 36,
+        "Fjob_prop": 0.0554699537750385
+      }
+    ]
+  }
+}

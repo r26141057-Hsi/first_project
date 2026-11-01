@@ -1,0 +1,1 @@
+{"question": "平日與週末喝酒程度，男女有差嗎？", "structure": "repeated", "analysis": "gee_ordinal", "reshape": {"cols": ["Dalc","Walc"], "value": "alc", "time": "day", "time_values": ["weekday","weekend"]}, "y": "alc", "time": "day", "x": ["sex"], "levels": ["1","2","3","4","5"]}

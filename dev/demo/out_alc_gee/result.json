@@ -1,0 +1,105 @@
+{
+  "method": "gee_ordinal",
+  "method_label": "Cumulative logit marginal model fitted by GEE",
+  "book_ref": "§9.3",
+  "tier": "A",
+  "estimates": [
+    {
+      "term": "dayweekend",
+      "estimate": -1.49203072251854,
+      "se": 0.0815438011911107,
+      "z": -18.2972917711026,
+      "p_value": 8.69657725059709e-75,
+      "odds_ratio_higher": 4.44611518390968,
+      "or_lower": 3.78940043125398,
+      "or_upper": 5.21664062355392,
+      "or_reverse": 0.224915450598077,
+      "or_reverse_lower": 0.191694247728097,
+      "or_reverse_upper": 0.263893990128956
+    },
+    {
+      "term": "sexM",
+      "estimate": -1.17345722078179,
+      "se": 0.140666692321389,
+      "z": -8.3421114225159,
+      "p_value": 7.29756425911614e-17,
+      "odds_ratio_higher": 3.23315105587923,
+      "or_lower": 2.45408889461589,
+      "or_upper": 4.2595301959382,
+      "or_reverse": 0.309295786901629,
+      "or_reverse_lower": 0.234767674837375,
+      "or_reverse_upper": 0.407483201685943
+    }
+  ],
+  "tests": [
+    {
+      "test": "Wald (robust SE): day",
+      "statistic": 334.790886156859,
+      "df": 1,
+      "p_value": 8.69657725059678e-75,
+      "book_ref": "§9.3"
+    },
+    {
+      "test": "Wald (robust SE): sex",
+      "statistic": 69.5908229856703,
+      "df": 1,
+      "p_value": 7.29756425911611e-17,
+      "book_ref": "§9.3"
+    }
+  ],
+  "tables": {
+    "distribution": [
+      {
+        "time": "weekday",
+        "n": 649,
+        "prop_1": 0.694915254237288,
+        "prop_2": 0.186440677966102,
+        "prop_3": 0.0662557781201849,
+        "prop_4": 0.0261941448382126,
+        "prop_5": 0.0261941448382126
+      },
+      {
+        "time": "weekend",
+        "n": 649,
+        "prop_1": 0.380585516178737,
+        "prop_2": 0.231124807395994,
+        "prop_3": 0.184899845916795,
+        "prop_4": 0.134052388289676,
+        "prop_5": 0.0693374422187981
+      }
+    ]
+  },
+  "warnings": [],
+  "facts": ["資料沒有 id 欄，依列號產生 id（1–649），每一列視為一個叢集。", "把 Dalc、Walc 轉成長格式：alc 欄為測量值，day 欄為時間（weekday = Dalc、weekend = Walc），共 1298 列。", "共 649 個叢集、1298 筆觀察值；每個叢集的筆數：2 筆 649 個。", "叢集間變數（同一個叢集內不變）：sex；叢集內變數（同一個叢集內會變）：day。", "累積 logit 邊際模型（GEE），類別由低到高：1 < 2 < 3 < 4 < 5；局部勝算比結構 = independence。", "dayweekend：整體來說，落在較高類別的勝算比 = 4.446（95% 信賴區間 3.789 到 5.217），P < 0.001（每個切點相同）。", "sexM：整體來說，落在較高類別的勝算比 = 3.233（95% 信賴區間 2.454 到 4.260），P < 0.001（每個切點相同）。", "Wald (robust SE): day = 334.79（df = 1），P < 0.001。", "Wald (robust SE): sex = 69.59（df = 1），P < 0.001。"],
+  "notes": {
+    "effect_type": "population-averaged",
+    "lorstr": "independence",
+    "levels": ["1", "2", "3", "4", "5"],
+    "clusters": {
+      "n_clusters": 649,
+      "n_obs": 1298,
+      "sizes": 649,
+      "n_singleton": 0
+    },
+    "cluster_level": {
+      "day": "within",
+      "sex": "between"
+    },
+    "predictors": {
+      "day": {
+        "type": "factor",
+        "ref": "weekday",
+        "levels": ["weekday", "weekend"]
+      },
+      "sex": {
+        "type": "factor",
+        "ref": "F",
+        "levels": ["F", "M"]
+      }
+    },
+    "cluster_reminder": "GEE 的 robust SE 是大樣本方法，叢集少時傾向低估（§9.2.4）；本資料有 649 個叢集，課本沒有給門檻，請自行判斷是否足夠。",
+    "reminder": "比例勝算：模型假設每個切點的效果相同（§6.3.2、§9.3.1），第一版不做正式檢定。"
+  },
+  "plots": "distribution.png",
+  "report": "分析報告_student_por_gee_ordinal.md"
+}

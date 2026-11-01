@@ -1,0 +1,207 @@
+{
+  "method": "paired_nominal",
+  "method_label": "Marginal homogeneity for nominal matched pairs",
+  "book_ref": "§8.3",
+  "tier": "A",
+  "estimates": [
+    {
+      "category": "at_home",
+      "prop_1": 0.208012326656394,
+      "prop_2": 0.0647149460708783,
+      "difference": 0.143297380585516,
+      "n12": 117,
+      "n21": 24,
+      "z": 7.83201286591863,
+      "p_value": 4.80120386096911e-15
+    },
+    {
+      "category": "health",
+      "prop_1": 0.073959938366718,
+      "prop_2": 0.0354391371340524,
+      "difference": 0.0385208012326656,
+      "n12": 39,
+      "n21": 14,
+      "z": 3.43401409871723,
+      "p_value": 0.000594713262333294
+    },
+    {
+      "category": "other",
+      "prop_1": 0.397534668721109,
+      "prop_2": 0.565485362095532,
+      "difference": -0.167950693374422,
+      "n12": 75,
+      "n21": 184,
+      "z": -6.77293044941308,
+      "p_value": 1.26199630093735e-11
+    },
+    {
+      "category": "services",
+      "prop_1": 0.209553158705701,
+      "prop_2": 0.278890600924499,
+      "difference": -0.0693374422187981,
+      "n12": 77,
+      "n21": 122,
+      "z": -3.18996542253751,
+      "p_value": 0.00142289817081632
+    },
+    {
+      "category": "teacher",
+      "prop_1": 0.110939907550077,
+      "prop_2": 0.0554699537750385,
+      "difference": 0.0554699537750385,
+      "n12": 56,
+      "n21": 20,
+      "z": 4.12948320967011,
+      "p_value": 3.63579552029955e-05
+    }
+  ],
+  "tests": [
+    {
+      "test": "Marginal homogeneity: symmetry vs quasi-symmetry LR",
+      "statistic": 108.45438959118,
+      "df": 4,
+      "p_value": 1.55446703106657e-22,
+      "book_ref": "§8.3.4"
+    },
+    {
+      "test": "Symmetry model deviance (fit)",
+      "statistic": 111.457775728448,
+      "df": 10,
+      "p_value": 2.71072635279007e-19,
+      "book_ref": "§8.3.4"
+    },
+    {
+      "test": "Quasi-symmetry model deviance (fit)",
+      "statistic": 3.00338613726818,
+      "df": 6,
+      "p_value": 0.808421714261339,
+      "book_ref": "§8.3.4"
+    },
+    {
+      "test": "CMH (score test of marginal homogeneity)",
+      "statistic": 99.7953847050643,
+      "df": 4,
+      "p_value": 1.08744085140848e-20,
+      "book_ref": "§8.3.3"
+    }
+  ],
+  "tables": {
+    "counts": {
+      "rows": ["at_home", "health", "other", "services", "teacher"],
+      "cols": ["at_home", "health", "other", "services", "teacher"],
+      "values": [
+        [18, 2, 77, 36, 2],
+        [1, 9, 21, 15, 2],
+        [14, 3, 183, 50, 8],
+        [7, 4, 58, 59, 8],
+        [2, 5, 28, 21, 16]
+      ]
+    },
+    "marginal": [
+      {
+        "category": "at_home",
+        "Mjob_count": 135,
+        "Mjob_prop": 0.208012326656394,
+        "Fjob_count": 42,
+        "Fjob_prop": 0.0647149460708783
+      },
+      {
+        "category": "health",
+        "Mjob_count": 48,
+        "Mjob_prop": 0.073959938366718,
+        "Fjob_count": 23,
+        "Fjob_prop": 0.0354391371340524
+      },
+      {
+        "category": "other",
+        "Mjob_count": 258,
+        "Mjob_prop": 0.397534668721109,
+        "Fjob_count": 367,
+        "Fjob_prop": 0.565485362095532
+      },
+      {
+        "category": "services",
+        "Mjob_count": 136,
+        "Mjob_prop": 0.209553158705701,
+        "Fjob_count": 181,
+        "Fjob_prop": 0.278890600924499
+      },
+      {
+        "category": "teacher",
+        "Mjob_count": 72,
+        "Mjob_prop": 0.110939907550077,
+        "Fjob_count": 36,
+        "Fjob_prop": 0.0554699537750385
+      }
+    ],
+    "symmetry_residuals": [
+      {
+        "pair": "at_home → health vs health → at_home",
+        "n_ij": 2,
+        "n_ji": 1,
+        "std_residual": 0.577350269189626
+      },
+      {
+        "pair": "at_home → other vs other → at_home",
+        "n_ij": 77,
+        "n_ji": 14,
+        "std_residual": 6.60419447134809
+      },
+      {
+        "pair": "at_home → services vs services → at_home",
+        "n_ij": 36,
+        "n_ji": 7,
+        "std_residual": 4.42245853964554
+      },
+      {
+        "pair": "at_home → teacher vs teacher → at_home",
+        "n_ij": 2,
+        "n_ji": 2,
+        "std_residual": 0
+      },
+      {
+        "pair": "health → other vs other → health",
+        "n_ij": 21,
+        "n_ji": 3,
+        "std_residual": 3.67423461417477
+      },
+      {
+        "pair": "health → services vs services → health",
+        "n_ij": 15,
+        "n_ji": 4,
+        "std_residual": 2.52357307257618
+      },
+      {
+        "pair": "health → teacher vs teacher → health",
+        "n_ij": 2,
+        "n_ji": 5,
+        "std_residual": -1.13389341902768
+      },
+      {
+        "pair": "other → services vs services → other",
+        "n_ij": 50,
+        "n_ji": 58,
+        "std_residual": -0.769800358919501
+      },
+      {
+        "pair": "other → teacher vs teacher → other",
+        "n_ij": 8,
+        "n_ji": 28,
+        "std_residual": -3.33333333333333
+      },
+      {
+        "pair": "services → teacher vs teacher → services",
+        "n_ij": 8,
+        "n_ji": 21,
+        "std_residual": -2.41403939630167
+      }
+    ]
+  },
+  "warnings": [],
+  "facts": ["共 649 人，每人兩次測量（Mjob、Fjob），類別：at_home、health、other、services、teacher。", "邊際同質性檢定（對稱 vs 準對稱模型）：LR = 108.45（df = 4），P < 0.001。", "對照：CMH 檢定 = 99.80（df = 4），P < 0.001。", "各類別的比例（Mjob → Fjob）：at_home 0.208 → 0.065；health 0.074 → 0.035；other 0.398 → 0.565；services 0.210 → 0.279；teacher 0.111 → 0.055。", "改變方向明顯不對稱的類別配對（|標準化殘差| > 2）：at_home → other vs other → at_home（6.60）；at_home → services vs services → at_home（4.42）；health → other vs other → health（3.67）；health → services vs services → health（2.52）；other → teacher vs teacher → other（-3.33）；services → teacher vs teacher → services（-2.41）。"],
+  "notes": {
+    "reminder": "逐類別的追蹤檢定（estimates）沒有做多重比較校正，只用來描述哪些類別改變；整體結論以邊際同質性檢定為準（§8.3.2）。"
+  },
+  "plots": ["square_table.png", "marginals.png"],
+  "report": "分析報告_student_por_paired_nominal.md"
+}
