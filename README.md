@@ -2,7 +2,9 @@
 
 一個 Claude Skill，分析**不獨立**的類別資料：同一個人被測量兩次以上（配對、前後測、重複測量），或同一群體內的多筆觀察（叢集）。
 
-**資料結構偵測 → 問使用者想問什麼 → 確認清單 → 依問題畫圖 → 判斷適不適合（✅／⚠️／❌），等使用者 OK → 計算 → 白話解釋並存成報告**
+**資料結構偵測 → 問使用者想問什麼 → 確認清單 → 依問題畫圖 → 判斷適不適合（✅／⚠️／❌），等使用者 OK → 計算 → 白話解釋 → 建議下一步，由使用者決定 →（重複）→ 結束時產生整份分析報告（Quarto HTML）**
+
+每做完一步，Skill 會建議最多 3 個下一步（例如 McNemar 之後改用 GEE 加入解釋變數、GEE 之後和 GLMM 並排），附上理由與課本節號；要不要做、做哪一個由使用者決定。最後的整份報告包含每一步為什麼做、結果與解釋、當時的建議和使用者的選擇、結論與重現程式碼。
 
 所有數字都由 Skill 內的程式計算，Claude 不可以自己算、換方向或加總。方法依據 Agresti《An Introduction to Categorical Data Analysis》第 3 版第 8–10 章。
 本 Skill 是類別資料分析期中報告的 **Part 3（相關資料）**；Part 1（關聯分析，categorical-association）與 Part 2（類別模型，categorical-modeling）是組員的 Skill，兩者遇到配對、重複測量、叢集資料時會轉介到這裡。
@@ -48,6 +50,7 @@ Part3/
     ├── test_engine.R             R 引擎 vs 課本（70 項）
     ├── test_python.py            Python 版 vs 課本與 R 版（57 項）
     ├── demo/                     示範資料 student_por.csv 與各分析的輸出
+    │   └── stepwise/             三步驟的逐步分析與整份報告（使用者的選擇是開發者模擬的測試資料）
     ├── skill-test/               真實資料實測：judgment.yml、verify.R、實測腳本、實測結果、輸出
     ├── build_zip.py              打包 categorical-correlated.zip
     └── ai-log.csv                AI 使用紀錄
@@ -72,7 +75,8 @@ Part3/
 ```
 Rscript dev/verify_methods.R      # references/methods.md 的程式碼 vs 課本
 Rscript dev/test_engine.R         # R 引擎 vs 課本
-python dev/test_python.py         # Python 版 vs 課本與 R 版（需要先跑過 dev/demo 的 R 輸出）
+Rscript categorical-correlated/scripts/build_report.R dev/demo/stepwise/output   # 整份報告（R 版）
+python dev/test_python.py         # Python 版 vs 課本與 R 版，含整份報告（需要先跑過 dev/demo 的 R 輸出）
 Rscript dev/skill-test/verify.R   # 實測題目的獨立驗證
 ```
 

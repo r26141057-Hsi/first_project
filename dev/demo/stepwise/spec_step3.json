@@ -1,0 +1,12 @@
+{
+  "question": "整體平均和同一位學生的效果各是多少？",
+  "structure": "repeated",
+  "types": {"passed": "binary", "sex": "binary", "period": "time"},
+  "method_id": "compare_gee_glmm",
+  "reason": "使用者也想知道同一位學生的效果；交互作用的證據不足，使用者決定拿掉（§10.1.4）",
+  "analysis": "compare_gee_glmm",
+  "reshape": {"cols": ["G1", "G2", "G3"], "value": "G", "time": "period", "time_values": [1, 2, 3]},
+  "recode": {"passed": {"from": "G", "breaks": [10], "labels": ["fail", "pass"]}},
+  "y": "passed", "time": "period", "x": ["sex"], "success": "pass",
+  "corstr": "exchangeable", "conf_level": 0.95
+}

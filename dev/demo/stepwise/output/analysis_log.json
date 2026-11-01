@@ -1,0 +1,46 @@
+{
+  "data_file": "student_por.csv",
+  "question": "學生三次考試的及格率有沒有改變？和性別有關嗎？（測試用：使用者的選擇由開發者模擬）",
+  "settings": [
+    "① 不獨立：同一位學生的 G1、G2、G3，叢集單位是學生（每一列一位學生）",
+    "② 資料格式：寬格式，G1–G3 合併成長格式，時間 period = 1、2、3",
+    "③ 結果變數：G 以 10 分切成 fail／pass（使用者同意切分，並知道會損失資訊）",
+    "⑤ 解釋變數：sex（參考組 F），時間當類別",
+    "⑦ 成功類別：pass",
+    "⑧ GEE 的 working correlation：exchangeable"
+  ],
+  "steps": [
+    {
+      "dir": "step1",
+      "question": "第一次和第三次考試的及格率一樣嗎？",
+      "reason": "使用者想先看頭尾兩次考試有沒有差別：同一位學生兩次的二元結果，用 McNemar 檢定（§8.1）。",
+      "suggestions": [
+        {"analysis": "gee_binary", "text": "三次一起看，並加入性別（含時間 × 性別交互作用）", "reason": "McNemar 只能比兩次，也不能加解釋變數；使用者的問題包含性別（§9.2）", "recommended": true},
+        {"analysis": "paired_binary", "text": "改比第一次和第二次", "reason": "看及格率在哪一段改變（§8.1）"},
+        {"analysis": null, "text": "結束，產生整份分析報告", "reason": "頭尾兩次的問題已經回答"}
+      ],
+      "choice": "選 1"
+    },
+    {
+      "dir": "step2",
+      "question": "三次考試的及格率有變化嗎？變化和性別有關嗎？",
+      "reason": "使用者選了上一步的建議 1：三次一起看，並加入性別與交互作用（§9.2）。",
+      "suggestions": [
+        {"analysis": "compare_gee_glmm", "text": "拿掉交互作用，GEE 與 GLMM 並排", "reason": "交互作用的證據不足（P = 0.853）只是選項、不是規定；並排可以同時回答整體平均與同一位學生的效果（§10.1.4）", "recommended": true},
+        {"analysis": "gee_binary", "text": "改用 independence working correlation 做敏感度比較", "reason": "robust SE 不依賴 working correlation，比較兩者可以確認結論穩定（§9.2.2）"},
+        {"analysis": null, "text": "結束，產生整份分析報告", "reason": "整體平均的問題已經回答"}
+      ],
+      "choice": "1，我也想知道同一個學生的效果"
+    },
+    {
+      "dir": "step3",
+      "question": "整體平均和同一位學生的效果各是多少？",
+      "reason": "使用者選了上一步的建議 1，並說明也想知道同一位學生的效果；交互作用由使用者決定拿掉（§10.1.4）。",
+      "suggestions": [
+        {"analysis": "compare_gee_glmm", "text": "加入其他解釋變數（例如 studytime）", "reason": "看性別效果在調整其他變數後是否改變"},
+        {"analysis": null, "text": "結束，產生整份分析報告", "reason": "兩種效果都已經回答", "recommended": true}
+      ],
+      "choice": "結束"
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "method": "paired_binary",
+  "method_label": "McNemar test for binary matched pairs",
+  "book_ref": "§8.1",
+  "tier": "A",
+  "estimates": [
+    {
+      "measure": "P(pass1 = pass)",
+      "estimate": 0.75808936825886,
+      "lower": null,
+      "upper": null,
+      "book_ref": "§8.1"
+    },
+    {
+      "measure": "P(pass3 = pass)",
+      "estimate": 0.845916795069337,
+      "lower": null,
+      "upper": null,
+      "book_ref": "§8.1"
+    },
+    {
+      "measure": "Difference of proportions (pass1 - pass3)",
+      "estimate": -0.0878274268104777,
+      "lower": -0.115813208287596,
+      "upper": -0.0625580857825022,
+      "book_ref": "§8.1.2"
+    },
+    {
+      "measure": "Difference of proportions (pass3 - pass1)",
+      "estimate": 0.0878274268104777,
+      "lower": 0.0625580857825022,
+      "upper": 0.115813208287596,
+      "book_ref": "§8.1.2"
+    },
+    {
+      "measure": "Marginal odds ratio pass1 vs pass3 (population-averaged)",
+      "estimate": 0.570812014896801,
+      "lower": null,
+      "upper": null,
+      "book_ref": "§8.2.2"
+    },
+    {
+      "measure": "Marginal odds ratio pass3 vs pass1 (population-averaged)",
+      "estimate": 1.75189024390244,
+      "lower": null,
+      "upper": null,
+      "book_ref": "§8.2.2"
+    },
+    {
+      "measure": "Conditional odds ratio n12/n21: pass1 vs pass3 (subject-specific)",
+      "estimate": 0.173913043478261,
+      "lower": null,
+      "upper": null,
+      "book_ref": "§8.2.4"
+    },
+    {
+      "measure": "Conditional odds ratio n21/n12: pass3 vs pass1 (subject-specific)",
+      "estimate": 5.75,
+      "lower": null,
+      "upper": null,
+      "book_ref": "§8.2.4"
+    }
+  ],
+  "tests": [
+    {
+      "test": "McNemar X2",
+      "statistic": 40.1111111111111,
+      "df": 1,
+      "p_value": 2.3992045231164e-10,
+      "book_ref": "§8.1.1"
+    },
+    {
+      "test": "Exact binomial (n12 ~ Bin(n*, 0.5))",
+      "statistic": 12,
+      "df": null,
+      "p_value": 7.03300083476889e-11,
+      "book_ref": "§8.1.1"
+    }
+  ],
+  "tables": {
+    "counts": {
+      "rows": ["pass", "fail"],
+      "cols": ["pass", "fail"],
+      "values": [
+        [480, 12],
+        [69, 88]
+      ]
+    },
+    "marginal": [
+      {
+        "category": "pass",
+        "pass1_count": 492,
+        "pass1_prop": 0.75808936825886,
+        "pass3_count": 549,
+        "pass3_prop": 0.845916795069337
+      },
+      {
+        "category": "fail",
+        "pass1_count": 157,
+        "pass1_prop": 0.24191063174114,
+        "pass3_count": 100,
+        "pass3_prop": 0.154083204930663
+      }
+    ]
+  },
+  "warnings": [],
+  "facts": ["新變數 pass1 由 G1 轉換：< 10 → fail；≥ 10 → pass。", "提醒：把連續的 G1 切成類別會損失資訊，結論可能隨切點改變。", "新變數 pass3 由 G3 轉換：< 10 → fail；≥ 10 → pass。", "提醒：把連續的 G3 切成類別會損失資訊，結論可能隨切點改變。", "共 649 人，每人兩次測量（pass1、pass3），類別：fail、pass。", "pass1 選「pass」的比例 0.758，pass3 為 0.846，差 -0.088（95% score 信賴區間 -0.116 到 -0.063）。", "回答改變的人：pass1 是「pass」但 pass3 不是的有 n12 = 12 人，反過來的有 n21 = 69 人；兩次回答相同的 568 人不影響檢定。", "主要檢定：McNemar X2，P < 0.001。", "McNemar X² = 40.11（df = 1），P < 0.001；精確二項檢定 P < 0.001。", "邊際勝算比（整體平均）：pass1 對 pass3 = 0.571，pass3 對 pass1 = 1.752。", "條件勝算比（同一個人）：pass1 對 pass3 = n12/n21 = 0.174，pass3 對 pass1 = n21/n12 = 5.750。"],
+  "notes": {
+    "primary_test": "McNemar X2",
+    "success": "pass",
+    "n_discordant": 81,
+    "reminder": "McNemar 只用到回答改變的人；條件勝算比是個體層次，邊際勝算比是整體層次，兩者不可混稱（§8.2.4）。"
+  },
+  "plots": ["square_table.png", "marginals.png"],
+  "report": "分析報告_student_por_paired_binary.md"
+}

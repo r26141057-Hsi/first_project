@@ -1,0 +1,12 @@
+{
+  "question": "三次考試的及格率有變化嗎？變化和性別有關嗎？",
+  "structure": "repeated",
+  "types": {"passed": "binary", "sex": "binary", "period": "time"},
+  "method_id": "gee_binary",
+  "reason": "三次測量、加入性別，問整體平均的效果；McNemar 只能比兩次、不能加解釋變數（§8.1 → §9.2）",
+  "analysis": "gee_binary",
+  "reshape": {"cols": ["G1", "G2", "G3"], "value": "G", "time": "period", "time_values": [1, 2, 3]},
+  "recode": {"passed": {"from": "G", "breaks": [10], "labels": ["fail", "pass"]}},
+  "y": "passed", "time": "period", "x": ["sex"], "interactions": ["period:sex"], "success": "pass",
+  "corstr": "exchangeable", "conf_level": 0.95
+}

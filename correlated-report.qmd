@@ -270,7 +270,27 @@ flowchart TD
 
 ## 這個 Skill 做什麼？
 
-使用者給一份資料，Skill 依序：**資料總覽與結構偵測 → 問想回答什麼 → 確認清單 → 依問題畫圖 → 判斷適不適合（✅／⚠️／❌）、等使用者 OK → 計算 → 用白話解釋並存成報告**。
+使用者給一份資料，Skill 從資料總覽開始，一步一步分析下去。**每一步做完都向使用者報告結果並建議下一步，要做什麼由使用者決定**；使用者說「結束」時，Skill 把整個過程整理成一份報告。
+
+```{mermaid}
+flowchart TD
+  S1["1 資料總覽<br/>找出可能不獨立的線索"] --> S2["2 確認清單<br/>資料結構、變數型態、設定"]
+  S2 --> S3["3 依問題畫圖"] --> S4["4 判斷適不適合<br/>✅ / ⚠️ / ❌"]
+  S4 -->|使用者 OK| S5["5 計算（R）"]
+  S5 --> S6["6 白話解釋結果"] --> S7{"7 建議下一步<br/>（最多 3 個＋結束）"}
+  S7 -->|使用者選一個| S7a["7a 簡短確認<br/>只列改變的設定"] -->|使用者 OK| S5
+  S7 -->|使用者選結束| S8["8 整份分析報告<br/>（Quarto HTML）"]
+```
+
+| 階段 | Skill 做什麼 | 誰決定 |
+|---|---|---|
+| 1–4 | 資料總覽、確認清單、畫圖、判斷適不適合；整個分析只做一次 | 使用者確認資料結構與設定 |
+| 5–6 | 程式計算，Claude 用固定段落解釋 | — |
+| 7 | 依課本建議下一步，每個附理由與節號 | **使用者選擇**（或自己提出） |
+| 7a | 只列和上一步不同的設定，再判斷一次適不適合 | 使用者確認 |
+| 8 | 程式把每一步的結果、建議與選擇合成一份報告 | 使用者決定何時結束 |
+
+建議下一步的依據寫在 `references/decision-tree.md`，例如：McNemar 只能比兩次、不能加解釋變數 → 建議 GEE（§8.1 → §9.2）；GEE 做完、也想知道同一個人的效果 → 建議和 GLMM 並排（§10.1.4）。**建議不只看 P 值**；「整體平均或同一個人」由使用者的問題決定。
 
 四條不能違反的規則：
 
@@ -296,7 +316,112 @@ flowchart TD
 - **階段 1 自動找出可能不獨立的線索**：重複的 id、欄名只差編號（`G1`、`G2`、`G3`）、欄名只差第一個字母且類別相同（`Dalc`／`Walc`、`Mjob`／`Fjob`）。線索都要使用者確認。
 - **注意事項清單**（20 條、13 個警告代碼）：例如不一致對數 ≤ 10（改用精確檢定）、缺失資料（GEE 需要 MCAR、GLMM 只需要 MAR）、積分點數不穩定、GEE 不能做概似比檢定。課本沒有給門檻的地方（例如「GEE 需要多少叢集」），Skill 不自己訂數字，只報告叢集數並提醒。
 
-# Skill 應用示範：真實資料實測
+# Skill 應用示範：一筆資料的完整分析
+
+```{r}
+sw <- "dev/demo/stepwise/output"
+slog <- jsonlite::read_json(file.path(sw, "analysis_log.json"))
+prof <- jsonlite::read_json(file.path(sw, "profile.json"), simplifyVector = TRUE)
+read_lines <- function(p) readLines(p, encoding = "UTF-8", warn = FALSE)
+# Lines under a "## " heading of a Skill-generated Markdown file, up to the next "## " heading.
+section_of <- function(lines, heading) {
+  i <- which(lines == heading)[1]
+  if (is.na(i)) return(character())
+  j <- which(grepl("^## ", lines) & seq_along(lines) > i)[1]
+  lines[(i + 1):(if (is.na(j)) length(lines) else j - 1)]
+}
+first_look <- read_lines(list.files(sw, "^初步檢視_.*\\.md$", full.names = TRUE)[1])
+method_names <- c(paired_binary = "McNemar 檢定（§8.1）", gee_binary = "GEE 邊際 logistic 模型（§9.2）",
+                  glmm_binary = "GLMM 隨機截距 logistic（§10.1–10.2）", compare_gee_glmm = "GEE 與 GLMM 並排（§10.1.4）",
+                  paired_nominal = "邊際同質性（§8.3）", paired_ordinal = "有序配對累積 logit（§8.4）",
+                  gee_ordinal = "GEE 累積 logit（§9.3）", gee_nominal = "GEE baseline-category logit（§9.3）")
+mname <- function(a) if (is.null(a)) "—" else method_names[[a]]
+```
+
+用一筆資料，從使用者丟出資料開始，走完 Skill 的每一個階段。以下每一段的數字與文字都**直接讀取 Skill 實際產生的檔案**（`dev/demo/stepwise/output/`），不是另外重打的。
+
+::: {.callout-note}
+這次示範中「使用者的選擇」由開發者模擬，用來展示流程；Skill 的建議、計算與解釋都是 Skill 產生的。實際使用時，每一個選擇都由使用者決定。
+:::
+
+**使用者的問題**：`r slog$question`
+
+## 階段 1：資料總覽
+
+Skill 讀進 `student_por.csv`：`r prof$n_rows` 列、`r prof$n_cols` 欄，每位學生一列。它從欄名與類別找出可能「不獨立」的線索，**每一條都要使用者確認**：
+
+```{r}
+h <- prof$structure$hints
+kable(data.frame(線索 = c(repeated_wide = "可能是重複測量", possible_matched_pairs_wide = "可能是配對")[h$type],
+                 欄位 = vapply(h$columns, paste, "", collapse = "、"), 根據 = h$evidence))
+```
+
+使用者確認：`G1`、`G2`、`G3` 是同一位學生的三次成績，要用來回答及格率的問題。
+
+## 階段 2：確認清單
+
+Skill 用一則訊息列出所有設定（附預設值與理由），使用者確認後的結果：
+
+```{r}
+#| results: asis
+cat(paste0("- ", unlist(slog$settings)), sep = "\n")
+```
+
+## 階段 3–4：初步檢視、判斷適不適合
+
+Skill 依確認的設定畫圖、算出重點數字：
+
+```{r}
+#| results: asis
+cat(section_of(first_look, "## 重點數字"), sep = "\n")
+```
+
+![各次考試、男女的及格比例（Skill 產生的圖）](dev/demo/stepwise/output/proportions_by_group.png){width=80%}
+
+接著 Skill 依注意事項清單判斷方法適不適合，等使用者 OK。使用者決定先看頭尾兩次考試，於是開始第 1 步。
+
+```{r}
+#| results: asis
+for (k in seq_along(slog$steps)) {
+  s <- slog$steps[[k]]
+  d <- file.path(sw, s$dir)
+  res <- jsonlite::read_json(file.path(d, "result.json"), simplifyVector = TRUE)
+  rep_lines <- read_lines(list.files(d, "^分析報告_.*\\.md$", full.names = TRUE)[1])
+  cat(sprintf("\n## 第 %d 步：%s\n\n", k, s$question))
+  cat(sprintf("**方法**：%s　**為什麼做這一步**：%s\n\n", mname(res$method), s$reason))
+  cat("**Skill 的報告**（階段 5–6）：\n\n")
+  cat(section_of(rep_lines, "## 結論與解釋"), sep = "\n")
+  cat(sprintf("\n\n![](%s/%s){width=80%%}\n\n", d, tail(res$plots, 1)))
+  cat("**Skill 建議的下一步**（階段 7）：\n\n| # | 建議 | 方法 | 理由 |\n|---|---|---|---|\n")
+  for (i in seq_along(s$suggestions)) {
+    g <- s$suggestions[[i]]
+    cat(sprintf("| %d | %s%s | %s | %s |\n", i, g$text, if (isTRUE(g$recommended)) "（推薦）" else "",
+                mname(g$analysis), g$reason))
+  }
+  cat(sprintf("\n**使用者的選擇**：「%s」\n\n", s$choice))
+}
+```
+
+## 階段 8：整份分析報告
+
+使用者選「結束」後，Claude 寫好整體結論（`結論.md`），執行 `build_report.R`，產生 `整份分析報告_student_por.html`（單一檔案，用瀏覽器打開）。報告的章節：
+
+```{r}
+#| results: asis
+qmd_lines <- read_lines(file.path(sw, "整份分析報告_student_por.qmd"))
+heads <- grep("^#{1,2} ", qmd_lines, value = TRUE)
+heads <- heads[seq_len(which(heads == "# 附錄：重現每一步的程式碼"))]
+cat(sub("^## ", "    - ", sub("^# ", "- ", heads)), sep = "\n")
+```
+
+報告裡的數字都由程式從各步驟的結果放入；Claude 只寫解釋與結論的文字。最後的結論：
+
+```{r}
+#| results: asis
+cat(section_of(read_lines(file.path(sw, "結論.md")), "## 研究問題的回答"), sep = "\n")
+```
+
+# Skill 的驗證：四個實測問題
 
 ```{r}
 st_dir <- "dev/skill-test"
@@ -397,7 +522,7 @@ kable(chk, caption = "數字：Skill 的 result.json vs 獨立驗證（verify.R�
 | 層次 | 內容 | 結果 |
 |---|---|---|
 | 課本 | 7 個課本例子，每個方法的數字和課本比對（R 版 `dev/test_engine.R`） | 70 / 70 |
-| Python 備案 | Python 版和課本、和 R 版逐項比對（數字、警告、結論句） | 57 / 57 |
+| Python 備案 | Python 版和課本、和 R 版逐項比對（數字、警告、結論句、整份報告） | 62 / 62 |
 | 真實資料 | 新對話實測，和人為判斷、獨立驗證比對 | 方法 4 / 4、數字全部一致 |
 
 ## 實測後的改進
@@ -411,6 +536,7 @@ kable(chk, caption = "數字：Skill 的 result.json vs 獨立驗證（verify.R�
 | 輸出寫到暫存資料夾，使用者找不到 | 規定一律寫到資料檔旁的 `output/` |
 | Claude 自己加了「GLMM 看到小數第二位就好」 | 規定只說明「已採用點數較多的結果」 |
 | （第二輪）加入交互作用後，GEE 與 GLMM 的變數檢定意義不同 | GEE 的主效果改為和交互作用一起檢定，兩者一致 |
+| 一題做完就結束；使用者中途改設定時沒有重新判斷適用性 | 新增階段 7（建議下一步、由使用者決定）、7a（只列改變的設定並重新判斷）、8（整份分析報告） |
 
 # 限制與下一步
 
@@ -418,7 +544,8 @@ kable(chk, caption = "數字：Skill 的 result.json vs 獨立驗證（verify.R�
 - **Python 版不做 GLMM**（statsmodels 沒有和 R 相同的估計方法），以及 `ar1`、`unstructured` 的 working correlation；遇到時交給使用者 R 程式碼。
 - **比例勝算假設**沒有正式檢定（§9.3.1）。
 - **缺失資料**只做提醒，不做多重插補（§9.5.2）。
-- 使用者直接要求改設定（例如加交互作用）時，Skill 直接執行、沒有重新判斷適用性；是否要回到判斷步驟，留待討論。
+- 逐步分析（階段 7–8）目前只用一筆資料、開發者模擬的選擇測試過；還沒有在新對話中由使用者實際操作驗證。
+- 整份報告只輸出 HTML（沒有 Quarto 時改 Markdown），沒有做 PDF。
 
 # 參考文獻 {.unnumbered}
 

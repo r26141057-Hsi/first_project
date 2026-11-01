@@ -9,3 +9,4 @@ __pycache__/
 # Python-vs-R comparison outputs written by dev/test_python.py (regenerated on every run)
 dev/demo/*_py/
 dev/demo/out_glmm_py/
+dev/demo/stepwise/output_py/

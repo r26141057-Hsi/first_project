@@ -5,7 +5,9 @@ description: 分析「不獨立」的類別資料：同一個人被測量兩次�
 
 # 相關類別資料分析 Skill（categorical-correlated）
 
-使用者給你一份資料。你負責：**資料總覽與結構偵測 → 問想回答什麼 → 確認清單 → 依問題畫圖 → 判斷適不適合、等使用者 OK → 呼叫 R 計算 → 用白話解釋並存成報告檔**。
+使用者給你一份資料。你負責：**資料總覽與結構偵測 → 問想回答什麼 → 確認清單 → 依問題畫圖 → 判斷適不適合、等使用者 OK → 呼叫 R 計算 → 用白話解釋 → 建議下一步、由使用者決定 →（重複分析）→ 結束時產生整份分析報告**。
+
+你只**建議**下一步，要做什麼由使用者決定。
 
 本 Skill 是類別資料分析期中報告的 Part 3。Part 1（categorical-association）處理兩個類別變數的關聯，Part 2（categorical-modeling）處理類別結果的模型；兩者都假設**每一列彼此獨立**，遇到配對、重複測量、叢集資料時轉介到這裡。
 
@@ -37,7 +39,17 @@ description: 分析「不獨立」的類別資料：同一個人被測量兩次�
 
 先找 R：執行 `Rscript --version`。有 R 用模式 1，沒有 R 用模式 2（見下方「兩種執行模式」）。Windows 上找不到時，試 `"C:\Program Files\R\R-<版本>\bin\Rscript.exe"`（例如 `R-4.5.1`）。下方指令的 `Rscript` 都換成找到的完整路徑。
 
-**輸出資料夾一律是資料檔旁邊的 `output/`**（例如資料在 `D:\data\student_por.csv`，就用 `D:\data\output`）。下方指令的 `<輸出資料夾>` 都指這個資料夾；同一份資料問好幾個問題時，用 `output/q1`、`output/q2` 分開。不要寫到暫存資料夾，使用者會找不到。
+**輸出資料夾一律是資料檔旁邊的 `output/`**（例如資料在 `D:\data\student_por.csv`，就用 `D:\data\output`）。下方指令的 `<輸出資料夾>` 都指這個資料夾。不要寫到暫存資料夾，使用者會找不到。
+
+```
+output/
+├── 資料總覽_<資料>.md、profile.json        階段 1
+├── 初步檢視_<資料>.md、圖、check.json      階段 3
+├── step1/、step2/、…                       每一步的 spec.json、result.json、圖、分析報告、reproduce
+├── analysis_log.json                       分析紀錄（你每一步更新）
+├── 結論.md                                 整體結論（階段 8 前寫）
+└── 整份分析報告_<資料>.qmd／.html／.md      階段 8
+```
 
 需要的 R 套件：`jsonlite readr readxl ggplot2 scales PropCIs geepack multgee lme4`。第一次使用先執行 `Rscript scripts/install_packages.R`。
 
@@ -48,8 +60,9 @@ description: 分析「不獨立」的類別資料：同一個人被測量兩次�
 | 階段 1 | `Rscript scripts/profile_data.R` | `python scripts/profile_data.py` |
 | 階段 3 | `Rscript scripts/describe_question.R` | `python scripts/describe_question.py` |
 | 階段 5 | `Rscript scripts/run_analysis.R` | `python scripts/run_analysis.py` |
+| 階段 8 | `Rscript scripts/build_report.R` | `python scripts/build_report.py` |
 
-兩種模式的參數、輸出檔名、`result.json`、facts 與警告都相同：Python 版是 R 版逐行對照改寫的，自動測試（`dev/test_python.py`）逐項比對兩邊的數字、facts 與警告，也比對課本的數字。所以階段 2、4、6 的做法完全一樣。Python 版需要 `numpy pandas scipy statsmodels matplotlib`。
+兩種模式的參數、輸出檔名、`result.json`、facts、警告與整份報告都相同：Python 版是 R 版逐行對照改寫的，自動測試（`dev/test_python.py`）逐項比對兩邊的數字、facts 與警告，也比對課本的數字。所以階段 2、4、6 的做法完全一樣。Python 版需要 `numpy pandas scipy statsmodels matplotlib`。
 
 模式 2 的規則：
 
@@ -70,8 +83,13 @@ description: 分析「不獨立」的類別資料：同一個人被測量兩次�
 | 2 確認清單 | 一則訊息列出所有設定（附預設值與理由）＋推薦的方法 | 停：等使用者回覆 |
 | 3 依問題畫圖 | 配對次數表、兩次的分布；或各時間點的比例 | 不停，直接進階段 4 |
 | 4 判斷適不適合 | 依注意事項清單標示 ✅／⚠️／❌ | 停：等使用者 OK |
-| 5 執行分析 | R 計算、畫圖、產生報告 | |
-| 6 解釋結果 | 固定段落＋用語規則，補進報告檔 | |
+| 5 執行分析 | R 計算、畫圖、產生這一步的報告（`output/stepK/`） | |
+| 6 解釋結果 | 固定段落＋用語規則，補進這一步的報告檔 | |
+| 7 建議下一步 | 最多 3 個建議＋「結束」，更新 `analysis_log.json` | 停：使用者決定 |
+| 7a 簡短確認 | 使用者選了下一步：只列和上一步不同的設定＋ ✅／⚠️／❌ | 停：等使用者 OK，然後回到階段 5 |
+| 8 整份分析報告 | 使用者選「結束」：寫 `結論.md`，產生整份報告 | |
+
+階段 1–4 整個分析只做一次；階段 5–7 每一步做一次，直到使用者選「結束」。
 
 ## 階段 1：資料總覽
 
@@ -202,8 +220,10 @@ Rscript scripts/describe_question.R <資料檔> question.json <輸出資料夾>
 執行：
 
 ```
-Rscript scripts/run_analysis.R <資料檔> spec.json <輸出資料夾>
+Rscript scripts/run_analysis.R <資料檔> spec.json <輸出資料夾>/step<K>
 ```
+
+`K` 是第幾步（1、2、3…）。每一步用新的資料夾，不要覆蓋前一步。
 
 輸出：`result.json`、圖、`分析報告_<資料>_<方法>.md`、`reproduce.R`、`spec.json` 副本。`result.json` 含 `error` 時，用白話說明並協助修正。GLMM 會配適好幾次（不同積分點數、每個變數的 LR 檢定），叢集多時要等一下。
 
@@ -218,7 +238,7 @@ Rscript scripts/run_analysis.R <資料檔> spec.json <輸出資料夾>
    - GLMM：「對同一個人（隨機效果相同時）……」；σ̂ 說明個體之間差多少
    - 並排：先講兩者方向是否一致，再解釋為什麼 GLMM 比較大（`ALL_SAME_RESPONSE` 的比例與 σ̂）
 3. **注意事項**：逐條說明 `warnings`（附節號）與對結論的影響；GEE 要說明 `notes.cluster_reminder`。
-4. **限制與下一步**：例如可以再比較另一種效果、資料其實獨立時轉介。
+4. **限制**：這一步的結果不能回答什麼（下一步的建議放在階段 7）。
 
 ### 用語規則（每次都要遵守）
 
@@ -247,9 +267,83 @@ Rscript scripts/run_analysis.R <資料檔> spec.json <輸出資料夾>
 
 原則：`facts` 可以改寫得更口語，但**數字不可更改**；P 值代表有沒有證據，不代表效果大小。
 
+解釋完直接進階段 7（同一則訊息）。
+
+## 階段 7：建議下一步，然後停下來
+
+依 `references/decision-tree.md` 的 Q4，在解釋之後寫：
+
+1. **建議的下一步**：最多 3 個，編號列出，每個寫
+   - 要做什麼（Skill 內的方法，或加／拿掉解釋變數、交互作用）
+   - 為什麼：連到這一步的結果（引用 R 輸出的數字）或使用者的問題，附節號
+   - 會回答什麼新問題
+   - 標出你推薦哪一個
+2. 最後一個選項固定是：**「結束，產生整份分析報告」**。
+3. 結尾：「請選一個編號，或直接說你想做什麼。」
+
+**然後停止，等使用者回覆。** 使用者沒有選之前，不執行下一步。
+
+- 不要只依 P 值決定建議；「整體平均或同一個人」由使用者的問題決定。
+- 使用者自己提的分析不在範圍內時，照「這個 Skill 不做什麼」說明並停止。
+
+### 分析紀錄 `analysis_log.json`
+
+每一步解釋完、給建議時更新（在 `<輸出資料夾>` 下）。使用者回覆後，把回覆原文寫進 `choice`：
+
+```json
+{
+  "data_file": "student_por.csv",
+  "question": "使用者一開始的問題（原文）",
+  "settings": ["① 不獨立：同一位學生的 G1、G2、G3，叢集單位是學生", "③ 結果變數：G 以 10 分切成 fail／pass"],
+  "steps": [
+    {"dir": "step1", "question": "這一步要回答的問題",
+     "reason": "為什麼做這一步（第 1 步寫階段 4 的推薦理由；之後寫使用者選了哪個建議）",
+     "suggestions": [
+       {"analysis": "gee_binary", "text": "三次一起看，並加入性別", "reason": "McNemar 只能比兩次（§8.1 → §9.2）", "recommended": true},
+       {"analysis": null, "text": "結束，產生整份分析報告", "reason": "問題已經回答"}],
+     "choice": "使用者回覆的原文"}
+  ]
+}
+```
+
+- `settings`：階段 2 確認過的設定，一項一句。
+- `analysis`：建議的方法 id；「結束」或不是新方法時寫 `null`。
+- 這個檔案只記錄判斷與選擇；**不要抄寫統計數字**，數字都在各步驟的報告裡。
+
+## 階段 7a：簡短確認（第 2 步起）
+
+使用者選了下一步之後，資料結構和變數型態已經確認過，**不重做階段 1–3**。用一則訊息：
+
+1. 這一步和上一步**不同的設定**，例如「方法：gee_binary → compare_gee_glmm」「交互作用：拿掉 period:sex」。
+2. 依 `references/checklist.md`，只對這一步標 ✅／⚠️／❌。
+3. 結尾：「請確認，或回覆『照建議』。」
+
+**然後停止，等使用者回覆**，確認後回到階段 5（輸出到下一個 `step<K>`）。
+
+使用者改了**結果變數、叢集單位、類別順序或 recode 門檻**時，不用簡短確認：回到階段 2 重新確認，再走階段 3、4。
+
+## 階段 8：整份分析報告
+
+使用者選「結束」時：
+
+1. 把 `choice` 寫進 `analysis_log.json` 的最後一步。
+2. 寫 `<輸出資料夾>/結論.md`：
+   - `# 結論`
+   - `## 研究問題的回答`：逐點回答使用者一開始的問題，說明每個答案來自第幾步；數字只能引用各步驟報告裡的數字
+   - `## 限制`：切分損失的資訊、觀察性資料不談因果、模型沒有做的部分
+3. 執行：
+
+   ```
+   Rscript scripts/build_report.R <輸出資料夾>
+   ```
+
+   程式把資料與問題、確認的設定、初步檢視、每一步（為什麼做、結果與解釋、下一步的建議與使用者的選擇）、結論、重現程式碼合成 `整份分析報告_<資料>.qmd`。有 Quarto 時轉成 `.html`；沒有 Quarto 時改輸出 `.md`。
+4. 程式印出 `WARNING` 時（例如某一步沒有「## 結論與解釋」），補好後重新執行。
+5. 告訴使用者報告檔的位置。**報告裡的數字都由程式從各步驟的報告放入，不可以自己修改報告檔裡的數字。**
+
 ## 參考資料（需要時再讀）
 
-- `references/decision-tree.md`：選方法的決策樹（階段 2、4）
+- `references/decision-tree.md`：選方法的決策樹（階段 2、4）與下一步的建議（階段 7，Q4）
 - `references/checklist.md`：注意事項清單與警告代碼（階段 4、6）
 - `references/methods.md`：每個方法的用途、假設、R 程式碼（沒有 R 時交給使用者執行）
 - `references/textbook-methods.md`：第 8–10 章的公式與觀念（使用者追問原理時）

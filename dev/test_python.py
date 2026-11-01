@@ -230,6 +230,50 @@ for stage, args, rdir in (("profile_data", [], "stage1"), ("describe_question", 
         bad = [k for k in keys if abs(R[k] - P.get(k, float("nan"))) > 1e-8]
         results.append((f"{rdir} numbers", len(bad), 0, 0, not bad))
 
+# ---- 3. Stage 8: the whole-analysis report (Python vs R on dev/demo/stepwise; run the R side first:
+#         Rscript categorical-correlated/scripts/build_report.R dev/demo/stepwise/output) ----
+import shutil  # noqa: E402
+
+src = os.path.join("dev", "demo", "stepwise", "output")
+pdir = os.path.join("dev", "demo", "stepwise", "output_py")
+shutil.rmtree(pdir, ignore_errors=True)
+shutil.copytree(src, pdir, ignore=shutil.ignore_patterns("整份分析報告_*"))
+
+
+def build_py(d):
+    return subprocess.run([sys.executable, os.path.join("categorical-correlated", "scripts", "build_report.py"), d,
+                           "--no-render"], capture_output=True, text=True, encoding="utf-8")
+
+
+def read_norm(p):
+    with open(p, encoding="utf-8") as f:
+        return f.read().replace("\r\n", "\n")
+
+
+proc = build_py(pdir)
+qmd_r = os.path.join(src, "整份分析報告_student_por.qmd")
+qmd_p = os.path.join(pdir, "整份分析報告_student_por.qmd")
+same_qmd = proc.returncode == 0 and os.path.exists(qmd_r) and read_norm(qmd_r) == read_norm(qmd_p)
+results.append(("report: Python qmd = R qmd", int(same_qmd), 1, 0, same_qmd))
+md_p = os.path.join(pdir, "整份分析報告_student_por.md")
+md_ok = os.path.exists(md_p) and read_norm(md_p).startswith("# 整份分析報告：student_por")
+results.append(("report: --no-render writes .md", int(md_ok), 1, 0, md_ok))
+# every step's result section is in the report, and nothing warns on the complete fixture
+qmd_text = read_norm(qmd_p) if os.path.exists(qmd_p) else ""
+results.append(("report: 3 steps + 3 suggestion tables", int(qmd_text.count("### 下一步的建議") == 3), 1, 0,
+                qmd_text.count("### 下一步的建議") == 3))
+results.append(("report: no warnings on complete fixture", int("WARNING" not in proc.stdout), 1, 0,
+                "WARNING" not in proc.stdout))
+# a missing conclusion and a step without its explanation are reported
+os.remove(os.path.join(pdir, "結論.md"))
+step1 = [f for f in os.listdir(os.path.join(pdir, "step1")) if f.startswith("分析報告_")][0]
+with open(os.path.join(pdir, "step1", step1), "w", encoding="utf-8") as f:
+    f.write("# 分析報告\n\n## 結果\n\n- x\n")
+proc = build_py(pdir)
+warned = "沒有 結論.md" in proc.stdout and "第 1 步的分析報告還沒有" in proc.stdout
+results.append(("report: warns on missing parts", int(warned), 1, 0, warned))
+shutil.rmtree(pdir, ignore_errors=True)
+
 w = max(len(r[0]) for r in results)
 for item, got, book, tol, ok in results:
     print(f"{item:<{w}}  {got:>12}  {book:>12}  {'OK' if ok else 'FAIL'}")
