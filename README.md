@@ -18,6 +18,43 @@
 
 兩個 `.html` 都是單一檔案，下載後用瀏覽器打開即可。`.qmd` 是原始檔，在 Part3 資料夾用 Quarto render（頁面上的數字會由 Skill 的程式重新計算）。
 
+## 第一個指令（上課示範）
+
+資料在 `data/student_por.csv`（說明見 [data/README.md](data/README.md)）。安裝好 Skill 後，在 Part3 資料夾開啟 Claude Code，輸入：
+
+```
+請用 categorical-correlated skill 分析 data/student_por.csv：學生三次考試的及格率有沒有改變？和性別有關嗎？
+```
+
+claude.ai 網頁版：先上傳 `student_por.csv`，指令改成「分析 student_por.csv」。Skill 的輸出寫在 `data/output/`。
+
+## 丟資料進去之後，AI 怎麼想、會問什麼？
+
+菱形是 AI 依程式輸出與課本判斷的地方，平行四邊形是 AI 一定要停下來問使用者的地方。
+
+```mermaid
+flowchart TD
+  IN(["使用者：資料檔＋問題"]) --> P1["階段 1：程式做資料總覽"]
+  P1 --> H{"有沒有不獨立的線索？<br/>重複的 id、G1／G2／G3、Dalc／Walc"}
+  H --> AQ[/"問：你想回答什麼問題？"/]
+  AQ --> C0[/"階段 2 ① 資料真的不獨立嗎？叢集單位？"/]
+  C0 -->|否| R1["轉介 Part 1／Part 2"]
+  C0 -->|是| C3[/"② 合併哪幾欄 ③ 結果型態、順序、門檻"/]
+  C3 --> Q2{"④ 只比兩次、沒有解釋變數？"}
+  Q2 -->|是| M["McNemar §8.1／邊際同質性 §8.3／有序配對 §8.4"]
+  Q2 -->|否| C6[/"⑤ 解釋變數 ⑥ 整體平均還是同一個人？"/]
+  C6 --> G["GEE §9／GLMM §10／兩者並排 §10.1.4"]
+  M --> J{"階段 3–4：畫圖，判斷 ✅／⚠️／❌"}
+  G --> J
+  J --> A4[/"問：用推薦的方法嗎？"/]
+  A4 --> P5["階段 5–6：程式計算，AI 白話解釋"]
+  P5 --> N{"階段 7：依課本建議最多 3 個下一步"}
+  N --> A7[/"問：要做哪一個？或結束"/]
+  A7 -->|選一個| A7a[/"7a 問：只改這些設定，OK 嗎？"/]
+  A7a --> P5
+  A7 -->|結束| P8["階段 8：整份分析報告"]
+```
+
 ## 涵蓋的方法
 
 | 情境 | 方法 | 課本 |
@@ -41,6 +78,7 @@ Part3/
 │   ├── references/               決策樹、注意事項清單、方法與 R 程式碼、課本公式
 │   ├── R/                        計算引擎（R 版，模式 1）
 │   └── scripts/                  各階段腳本：*.R（模式 1）、*.py（模式 2，沒有 R 時）
+├── data/                         示範資料 student_por.csv 與說明（上課示範用；Skill 輸出寫到 data/output/）
 ├── correlated-report.qmd/.html   Part 3 報告
 ├── make-skill-tutorial.qmd/.html 製作教學
 ├── skill規劃.md、章節建議.md       規劃文件
@@ -82,7 +120,7 @@ Rscript dev/skill-test/verify.R   # 實測題目的獨立驗證
 
 ## 示範資料
 
-`dev/demo/student_por.csv`：Cortez, P. (2008). Student Performance [Dataset]. UCI Machine Learning Repository. <https://doi.org/10.24432/C5TG7T>。授權：CC BY 4.0。取自組員 Part 2 的版本（逗號分隔，新增 `pass` 欄 = G3 ≥ 10）。
+`data/student_por.csv`（開發用的同一份複本在 `dev/demo/`）：Cortez, P. (2008). Student Performance [Dataset]. UCI Machine Learning Repository. <https://doi.org/10.24432/C5TG7T>。授權：CC BY 4.0。取自組員 Part 2 的版本（逗號分隔，新增 `pass` 欄 = G3 ≥ 10）。
 
 | 欄位 | 用途 |
 |---|---|

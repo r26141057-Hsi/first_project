@@ -12,3 +12,5 @@
 2026-11-01,實測第二輪,重測 q1b、q3b；依組員指示代送 q3b 的追問與 q3c 的腳本回覆,組員選擇由 AI 代送,問題都已修正；新發現 GEE 與 GLMM 的交互作用檢定不一致並修正（70/70）
 2026-11-01,Python 備案,把引擎改寫成 Python；有序／名目 GEE 以最大概似＋叢集 sandwich 重現 multgee,—,57/57；SE 起初差 0.00007，改用 expected information 後一致；ar1、unstructured、GLMM 對不上 R，改為明確拒絕
 2026-11-01,報告,寫 Part 3 報告頁、製作教學、README；頁面上的數字由程式在 render 時計算或讀取實測輸出,—,correlated-report.html、make-skill-tutorial.html
+2026-11-01,逐步分析,比較老師檢查過的兩份 Skill，寫設計稿；加入階段 7／7a／8 與 build_report.R／.py；改寫報告第 8 章為一筆資料的完整示範,組員核可設計並選用推薦的三個決定,Python 測試 62/62；R 與 Python 產生的整份報告一致
+2026-11-02,上課示範,加入 data/ 資料夾、報告中 AI 的決策樹與第一個指令；更新製作教學,組員提出需求；第一個指令由 AI 提議，沿用報告第 8 章的問題,correlated-report.html、make-skill-tutorial.html

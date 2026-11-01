@@ -10,3 +10,6 @@ __pycache__/
 dev/demo/*_py/
 dev/demo/out_glmm_py/
 dev/demo/stepwise/output_py/
+
+# Skill output written next to the class-demo data (one per run, not part of the repo)
+data/output/

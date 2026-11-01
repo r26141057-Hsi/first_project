@@ -4808,8 +4808,10 @@ window.Quarto = {
   <li><a href="#skill-介紹categorical-correlated" id="toc-skill-介紹categorical-correlated" class="nav-link" data-scroll-target="#skill-介紹categorical-correlated"><span class="header-section-number">7</span> Skill 介紹：categorical-correlated</a>
   <ul class="collapse">
   <li><a href="#這個-skill-做什麼" id="toc-這個-skill-做什麼" class="nav-link" data-scroll-target="#這個-skill-做什麼"><span class="header-section-number">7.1</span> 這個 Skill 做什麼？</a></li>
-  <li><a href="#涵蓋的方法" id="toc-涵蓋的方法" class="nav-link" data-scroll-target="#涵蓋的方法"><span class="header-section-number">7.2</span> 涵蓋的方法</a></li>
-  <li><a href="#會偵測什麼提醒什麼" id="toc-會偵測什麼提醒什麼" class="nav-link" data-scroll-target="#會偵測什麼提醒什麼"><span class="header-section-number">7.3</span> 會偵測什麼、提醒什麼？</a></li>
+  <li><a href="#丟資料進去之後ai-怎麼想會問什麼" id="toc-丟資料進去之後ai-怎麼想會問什麼" class="nav-link" data-scroll-target="#丟資料進去之後ai-怎麼想會問什麼"><span class="header-section-number">7.2</span> 丟資料進去之後，AI 怎麼想、會問什麼？</a></li>
+  <li><a href="#怎麼開始第一個指令" id="toc-怎麼開始第一個指令" class="nav-link" data-scroll-target="#怎麼開始第一個指令"><span class="header-section-number">7.3</span> 怎麼開始：第一個指令</a></li>
+  <li><a href="#涵蓋的方法" id="toc-涵蓋的方法" class="nav-link" data-scroll-target="#涵蓋的方法"><span class="header-section-number">7.4</span> 涵蓋的方法</a></li>
+  <li><a href="#會偵測什麼提醒什麼" id="toc-會偵測什麼提醒什麼" class="nav-link" data-scroll-target="#會偵測什麼提醒什麼"><span class="header-section-number">7.5</span> 會偵測什麼、提醒什麼？</a></li>
   </ul></li>
   <li><a href="#skill-應用示範一筆資料的完整分析" id="toc-skill-應用示範一筆資料的完整分析" class="nav-link" data-scroll-target="#skill-應用示範一筆資料的完整分析"><span class="header-section-number">8</span> Skill 應用示範：一筆資料的完整分析</a>
   <ul class="collapse">
@@ -5403,8 +5405,109 @@ window.Quarto = {
 <li><strong>分清楚兩種效果</strong>：GEE 一律說「整體來說」，GLMM 一律說「對同一個人」；數字不同時不可以說其中一個算錯。</li>
 </ol>
 </section>
-<section id="涵蓋的方法" class="level2" data-number="7.2">
-<h2 data-number="7.2" class="anchored" data-anchor-id="涵蓋的方法"><span class="header-section-number">7.2</span> 涵蓋的方法</h2>
+<section id="丟資料進去之後ai-怎麼想會問什麼" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="丟資料進去之後ai-怎麼想會問什麼"><span class="header-section-number">7.2</span> 丟資料進去之後，AI 怎麼想、會問什麼？</h2>
+<p>下圖是 Skill 收到資料後的決策樹。<strong>菱形是 AI 自己依程式輸出與課本判斷的地方，黃色是 AI 一定要停下來問使用者的地方</strong>；資料本身無法證明的事（哪些列是同一個人、數字代碼有沒有順序、要哪一種效果），AI 不可以自己假設。</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart TD
+  IN([&quot;使用者：資料檔＋問題&quot;]) --&gt; P1[&quot;階段 1：程式做資料總覽&lt;br/&gt;變數型態、缺失、類別次數&quot;]
+  P1 --&gt; H{&quot;有沒有不獨立的線索？&lt;br/&gt;重複的 id、G1／G2／G3、Dalc／Walc&quot;}
+  H --&gt;|有：逐條列出| AQ
+  H --&gt;|沒有：提醒沒偵測到不代表獨立| AQ
+  AQ[/&quot;問：你想回答什麼問題？&lt;br/&gt;（一開始就說了就跳過）&quot;/]
+  AQ --&gt; C0
+  subgraph S2 [&quot; &quot;]
+    C0[/&quot;&lt;b&gt;階段 2：確認清單（一則訊息問完）&lt;/b&gt;&lt;br/&gt;① 資料真的不獨立嗎？叢集單位是什麼？&quot;/]
+    C0 --&gt;|是| C1[/&quot;② 哪幾欄要合併、時間怎麼編號&quot;/]
+    C1 --&gt; C3[/&quot;③ 結果是二元／名目／有序？&lt;br/&gt;數字代碼的順序；要切分時的門檻&quot;/]
+    C3 --&gt; Q2{&quot;④ 只比兩次、&lt;br/&gt;沒有解釋變數？&quot;}
+    Q2 --&gt;|否| C6[/&quot;⑤ 解釋變數、參考組&lt;br/&gt;⑥ 要整體平均，還是同一個人的效果？&quot;/]
+  end
+  C0 --&gt;|否| R1[&quot;轉介 Part 1／Part 2&quot;]
+  Q2 --&gt;|是| M[&quot;配對比較，依結果型態&lt;br/&gt;二元：McNemar §8.1&lt;br/&gt;名目：邊際同質性 §8.3&lt;br/&gt;有序：累積 logit §8.4&quot;]
+  C6 --&gt; G[&quot;依要的效果&lt;br/&gt;整體平均：GEE §9.2–9.3&lt;br/&gt;同一個人：GLMM §10.1–10.2&lt;br/&gt;兩者：並排 §10.1.4&quot;]
+  M --&gt; P3[&quot;階段 3：依問題畫圖、算重點數字&quot;]
+  G --&gt; P3
+  P3 --&gt; J{&quot;階段 4：適不適合？&lt;br/&gt;對照注意事項清單 ✅／⚠️／❌&quot;}
+  J --&gt; A4[/&quot;問：用推薦的方法嗎？&quot;/]
+  A4 --&gt;|OK| P5[&quot;階段 5–6：程式計算，AI 白話解釋&quot;]
+  P5 --&gt; N{&quot;階段 7：依課本，下一步可以做什麼？&lt;br/&gt;最多 3 個，各附理由與節號&quot;}
+  N --&gt; A7[/&quot;問：要做哪一個？或結束&quot;/]
+  A7 --&gt;|只換方法、解釋變數| A7a[/&quot;7a 問：只改這些設定，OK 嗎？&quot;/]
+  A7a --&gt;|OK| P5
+  A7 --&gt;|改結果變數、叢集單位、門檻| C0
+  A7 --&gt;|結束| P8[&quot;階段 8：整份分析報告&quot;]
+  classDef ask fill:#fff3cd,stroke:#c99a00,color:#222
+  class AQ,C0,C1,C3,C6,A4,A7,A7a ask
+  style S2 fill:#f3f6fa,stroke:#7a8ca3,color:#222
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>AI 停下來的地方、它依據什麼、會問什麼：</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>階段</th>
+<th>AI 依據什麼想</th>
+<th>AI 會問你</th>
+<th>例如你可以回答</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1 資料總覽</td>
+<td>程式找出的線索（<code>profile.json</code>）</td>
+<td>你想用這份資料回答什麼問題？</td>
+<td>三次考試的及格率有沒有改變？和性別有關嗎？</td>
+</tr>
+<tr class="even">
+<td>2 確認清單</td>
+<td>決策樹 Q0–Q3（<code>references/decision-tree.md</code>）</td>
+<td>①–⑧ 每一項設定，附預設值與理由</td>
+<td>「照預設」，或「③ 10 分以上算及格」</td>
+</tr>
+<tr class="odd">
+<td>4 適不適合</td>
+<td>注意事項清單（<code>references/checklist.md</code>）與圖表的數字</td>
+<td>推薦的方法 ✅／⚠️／❌，用推薦的嗎？</td>
+<td>「用推薦的」</td>
+</tr>
+<tr class="even">
+<td>7 下一步</td>
+<td>決策樹 Q4：這一步的結果、你的問題、課本</td>
+<td>最多 3 個建議＋結束，要做哪一個？</td>
+<td>「選 1」、「結束」，或自己提出</td>
+</tr>
+<tr class="odd">
+<td>7a 簡短確認</td>
+<td>和上一步比，改了哪些設定</td>
+<td>只改這些，OK 嗎？</td>
+<td>「照建議」</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="怎麼開始第一個指令" class="level2" data-number="7.3">
+<h2 data-number="7.3" class="anchored" data-anchor-id="怎麼開始第一個指令"><span class="header-section-number">7.3</span> 怎麼開始：第一個指令</h2>
+<p>示範資料放在 <code>data/</code> 資料夾（<code>data/student_por.csv</code>，欄位說明見 <code>data/README.md</code>）。安裝好 Skill 之後，在 Part3 資料夾開啟 Claude Code，輸入：</p>
+<pre class="text"><code>請用 categorical-correlated skill 分析 data/student_por.csv：學生三次考試的及格率有沒有改變？和性別有關嗎？</code></pre>
+<p>在 claude.ai 網頁版則先上傳 <code>student_por.csv</code>，指令改成「分析 student_por.csv」。這一句就是下一章示範的起點：AI 會先給資料總覽，再用確認清單問你上圖黃色的問題，之後每一步都由你決定。Skill 的輸出寫在 <code>data/output/</code>。</p>
+</section>
+<section id="涵蓋的方法" class="level2" data-number="7.4">
+<h2 data-number="7.4" class="anchored" data-anchor-id="涵蓋的方法"><span class="header-section-number">7.4</span> 涵蓋的方法</h2>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -5457,8 +5560,8 @@ window.Quarto = {
 </tbody>
 </table>
 </section>
-<section id="會偵測什麼提醒什麼" class="level2" data-number="7.3">
-<h2 data-number="7.3" class="anchored" data-anchor-id="會偵測什麼提醒什麼"><span class="header-section-number">7.3</span> 會偵測什麼、提醒什麼？</h2>
+<section id="會偵測什麼提醒什麼" class="level2" data-number="7.5">
+<h2 data-number="7.5" class="anchored" data-anchor-id="會偵測什麼提醒什麼"><span class="header-section-number">7.5</span> 會偵測什麼、提醒什麼？</h2>
 <ul>
 <li><strong>階段 1 自動找出可能不獨立的線索</strong>：重複的 id、欄名只差編號（<code>G1</code>、<code>G2</code>、<code>G3</code>）、欄名只差第一個字母且類別相同（<code>Dalc</code>／<code>Walc</code>、<code>Mjob</code>／<code>Fjob</code>）。線索都要使用者確認。</li>
 <li><strong>注意事項清單</strong>（20 條、13 個警告代碼）：例如不一致對數 ≤ 10（改用精確檢定）、缺失資料（GEE 需要 MCAR、GLMM 只需要 MAR）、積分點數不穩定、GEE 不能做概似比檢定。課本沒有給門檻的地方（例如「GEE 需要多少叢集」），Skill 不自己訂數字，只報告叢集數並提醒。</li>
@@ -5470,23 +5573,23 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>R code（點開查看）</summary>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>sw <span class="ot">&lt;-</span> <span class="st">&quot;dev/demo/stepwise/output&quot;</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>slog <span class="ot">&lt;-</span> jsonlite<span class="sc">::</span><span class="fu">read_json</span>(<span class="fu">file.path</span>(sw, <span class="st">&quot;analysis_log.json&quot;</span>))</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>prof <span class="ot">&lt;-</span> jsonlite<span class="sc">::</span><span class="fu">read_json</span>(<span class="fu">file.path</span>(sw, <span class="st">&quot;profile.json&quot;</span>), <span class="at">simplifyVector =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>read_lines <span class="ot">&lt;-</span> <span class="cf">function</span>(p) <span class="fu">readLines</span>(p, <span class="at">encoding =</span> <span class="st">&quot;UTF-8&quot;</span>, <span class="at">warn =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Lines under a &quot;## &quot; heading of a Skill-generated Markdown file, up to the next &quot;## &quot; heading.</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>section_of <span class="ot">&lt;-</span> <span class="cf">function</span>(lines, heading) {</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  i <span class="ot">&lt;-</span> <span class="fu">which</span>(lines <span class="sc">==</span> heading)[<span class="dv">1</span>]</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.na</span>(i)) <span class="fu">return</span>(<span class="fu">character</span>())</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  j <span class="ot">&lt;-</span> <span class="fu">which</span>(<span class="fu">grepl</span>(<span class="st">&quot;^## &quot;</span>, lines) <span class="sc">&amp;</span> <span class="fu">seq_along</span>(lines) <span class="sc">&gt;</span> i)[<span class="dv">1</span>]</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  lines[(i <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>(<span class="cf">if</span> (<span class="fu">is.na</span>(j)) <span class="fu">length</span>(lines) <span class="cf">else</span> j <span class="sc">-</span> <span class="dv">1</span>)]</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>first_look <span class="ot">&lt;-</span> <span class="fu">read_lines</span>(<span class="fu">list.files</span>(sw, <span class="st">&quot;^初步檢視_.*</span><span class="sc">\\</span><span class="st">.md$&quot;</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span>])</span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>method_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">paired_binary =</span> <span class="st">&quot;McNemar 檢定（§8.1）&quot;</span>, <span class="at">gee_binary =</span> <span class="st">&quot;GEE 邊際 logistic 模型（§9.2）&quot;</span>,</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>                  <span class="at">glmm_binary =</span> <span class="st">&quot;GLMM 隨機截距 logistic（§10.1–10.2）&quot;</span>, <span class="at">compare_gee_glmm =</span> <span class="st">&quot;GEE 與 GLMM 並排（§10.1.4）&quot;</span>,</span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>                  <span class="at">paired_nominal =</span> <span class="st">&quot;邊際同質性（§8.3）&quot;</span>, <span class="at">paired_ordinal =</span> <span class="st">&quot;有序配對累積 logit（§8.4）&quot;</span>,</span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>                  <span class="at">gee_ordinal =</span> <span class="st">&quot;GEE 累積 logit（§9.3）&quot;</span>, <span class="at">gee_nominal =</span> <span class="st">&quot;GEE baseline-category logit（§9.3）&quot;</span>)</span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>mname <span class="ot">&lt;-</span> <span class="cf">function</span>(a) <span class="cf">if</span> (<span class="fu">is.null</span>(a)) <span class="st">&quot;—&quot;</span> <span class="cf">else</span> method_names[[a]]</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>sw <span class="ot">&lt;-</span> <span class="st">&quot;dev/demo/stepwise/output&quot;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>slog <span class="ot">&lt;-</span> jsonlite<span class="sc">::</span><span class="fu">read_json</span>(<span class="fu">file.path</span>(sw, <span class="st">&quot;analysis_log.json&quot;</span>))</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>prof <span class="ot">&lt;-</span> jsonlite<span class="sc">::</span><span class="fu">read_json</span>(<span class="fu">file.path</span>(sw, <span class="st">&quot;profile.json&quot;</span>), <span class="at">simplifyVector =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>read_lines <span class="ot">&lt;-</span> <span class="cf">function</span>(p) <span class="fu">readLines</span>(p, <span class="at">encoding =</span> <span class="st">&quot;UTF-8&quot;</span>, <span class="at">warn =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Lines under a &quot;## &quot; heading of a Skill-generated Markdown file, up to the next &quot;## &quot; heading.</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>section_of <span class="ot">&lt;-</span> <span class="cf">function</span>(lines, heading) {</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  i <span class="ot">&lt;-</span> <span class="fu">which</span>(lines <span class="sc">==</span> heading)[<span class="dv">1</span>]</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.na</span>(i)) <span class="fu">return</span>(<span class="fu">character</span>())</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  j <span class="ot">&lt;-</span> <span class="fu">which</span>(<span class="fu">grepl</span>(<span class="st">&quot;^## &quot;</span>, lines) <span class="sc">&amp;</span> <span class="fu">seq_along</span>(lines) <span class="sc">&gt;</span> i)[<span class="dv">1</span>]</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  lines[(i <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>(<span class="cf">if</span> (<span class="fu">is.na</span>(j)) <span class="fu">length</span>(lines) <span class="cf">else</span> j <span class="sc">-</span> <span class="dv">1</span>)]</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>first_look <span class="ot">&lt;-</span> <span class="fu">read_lines</span>(<span class="fu">list.files</span>(sw, <span class="st">&quot;^初步檢視_.*</span><span class="sc">\\</span><span class="st">.md$&quot;</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span>])</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>method_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">paired_binary =</span> <span class="st">&quot;McNemar 檢定（§8.1）&quot;</span>, <span class="at">gee_binary =</span> <span class="st">&quot;GEE 邊際 logistic 模型（§9.2）&quot;</span>,</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>                  <span class="at">glmm_binary =</span> <span class="st">&quot;GLMM 隨機截距 logistic（§10.1–10.2）&quot;</span>, <span class="at">compare_gee_glmm =</span> <span class="st">&quot;GEE 與 GLMM 並排（§10.1.4）&quot;</span>,</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>                  <span class="at">paired_nominal =</span> <span class="st">&quot;邊際同質性（§8.3）&quot;</span>, <span class="at">paired_ordinal =</span> <span class="st">&quot;有序配對累積 logit（§8.4）&quot;</span>,</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>                  <span class="at">gee_ordinal =</span> <span class="st">&quot;GEE 累積 logit（§9.3）&quot;</span>, <span class="at">gee_nominal =</span> <span class="st">&quot;GEE baseline-category logit（§9.3）&quot;</span>)</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>mname <span class="ot">&lt;-</span> <span class="cf">function</span>(a) <span class="cf">if</span> (<span class="fu">is.null</span>(a)) <span class="st">&quot;—&quot;</span> <span class="cf">else</span> method_names[[a]]</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>用一筆資料，從使用者丟出資料開始，走完 Skill 的每一個階段。以下每一段的數字與文字都<strong>直接讀取 Skill 實際產生的檔案</strong>（<code>dev/demo/stepwise/output/</code>），不是另外重打的。</p>
@@ -5510,9 +5613,9 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>R code（點開查看）</summary>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>h <span class="ot">&lt;-</span> prof<span class="sc">$</span>structure<span class="sc">$</span>hints</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">data.frame</span>(線索 <span class="ot">=</span> <span class="fu">c</span>(<span class="at">repeated_wide =</span> <span class="st">&quot;可能是重複測量&quot;</span>, <span class="at">possible_matched_pairs_wide =</span> <span class="st">&quot;可能是配對&quot;</span>)[h<span class="sc">$</span>type],</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                 欄位 <span class="ot">=</span> <span class="fu">vapply</span>(h<span class="sc">$</span>columns, paste, <span class="st">&quot;&quot;</span>, <span class="at">collapse =</span> <span class="st">&quot;、&quot;</span>), 根據 <span class="ot">=</span> h<span class="sc">$</span>evidence))</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>h <span class="ot">&lt;-</span> prof<span class="sc">$</span>structure<span class="sc">$</span>hints</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">data.frame</span>(線索 <span class="ot">=</span> <span class="fu">c</span>(<span class="at">repeated_wide =</span> <span class="st">&quot;可能是重複測量&quot;</span>, <span class="at">possible_matched_pairs_wide =</span> <span class="st">&quot;可能是配對&quot;</span>)[h<span class="sc">$</span>type],</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                 欄位 <span class="ot">=</span> <span class="fu">vapply</span>(h<span class="sc">$</span>columns, paste, <span class="st">&quot;&quot;</span>, <span class="at">collapse =</span> <span class="st">&quot;、&quot;</span>), 根據 <span class="ot">=</span> h<span class="sc">$</span>evidence))</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -5560,7 +5663,7 @@ window.Quarto = {
 <p>Skill 用一則訊息列出所有設定（附預設值與理由），使用者確認後的結果：</p>
 <details class="code-fold">
 <summary>R code（點開查看）</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">paste0</span>(<span class="st">&quot;- &quot;</span>, <span class="fu">unlist</span>(slog<span class="sc">$</span>settings)), <span class="at">sep =</span> <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">paste0</span>(<span class="st">&quot;- &quot;</span>, <span class="fu">unlist</span>(slog<span class="sc">$</span>settings)), <span class="at">sep =</span> <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <ul>
 <li>① 不獨立：同一位學生的 G1、G2、G3，叢集單位是學生（每一列一位學生）</li>
@@ -5576,7 +5679,7 @@ window.Quarto = {
 <p>Skill 依確認的設定畫圖、算出重點數字：</p>
 <details class="code-fold">
 <summary>R code（點開查看）</summary>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">section_of</span>(first_look, <span class="st">&quot;## 重點數字&quot;</span>), <span class="at">sep =</span> <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">section_of</span>(first_look, <span class="st">&quot;## 重點數字&quot;</span>), <span class="at">sep =</span> <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <ul>
 <li>資料沒有 id 欄，依列號產生 id（1–649），每一列視為一個叢集。</li>
@@ -5597,24 +5700,24 @@ window.Quarto = {
 <p>接著 Skill 依注意事項清單判斷方法適不適合，等使用者 OK。使用者決定先看頭尾兩次考試，於是開始第 1 步。</p>
 <details class="code-fold">
 <summary>R code（點開查看）</summary>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (k <span class="cf">in</span> <span class="fu">seq_along</span>(slog<span class="sc">$</span>steps)) {</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  s <span class="ot">&lt;-</span> slog<span class="sc">$</span>steps[[k]]</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  d <span class="ot">&lt;-</span> <span class="fu">file.path</span>(sw, s<span class="sc">$</span>dir)</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> jsonlite<span class="sc">::</span><span class="fu">read_json</span>(<span class="fu">file.path</span>(d, <span class="st">&quot;result.json&quot;</span>), <span class="at">simplifyVector =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  rep_lines <span class="ot">&lt;-</span> <span class="fu">read_lines</span>(<span class="fu">list.files</span>(d, <span class="st">&quot;^分析報告_.*</span><span class="sc">\\</span><span class="st">.md$&quot;</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span>])</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">## 第 %d 步：%s</span><span class="sc">\n\n</span><span class="st">&quot;</span>, k, s<span class="sc">$</span>question))</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">&quot;**方法**：%s　**為什麼做這一步**：%s</span><span class="sc">\n\n</span><span class="st">&quot;</span>, <span class="fu">mname</span>(res<span class="sc">$</span>method), s<span class="sc">$</span>reason))</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;**Skill 的報告**（階段 5–6）：</span><span class="sc">\n\n</span><span class="st">&quot;</span>)</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">section_of</span>(rep_lines, <span class="st">&quot;## 結論與解釋&quot;</span>), <span class="at">sep =</span> <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">&quot;</span><span class="sc">\n\n</span><span class="st">![](%s/%s){width=80%%}</span><span class="sc">\n\n</span><span class="st">&quot;</span>, d, <span class="fu">tail</span>(res<span class="sc">$</span>plots, <span class="dv">1</span>)))</span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;**Skill 建議的下一步**（階段 7）：</span><span class="sc">\n\n</span><span class="st">| # | 建議 | 方法 | 理由 |</span><span class="sc">\n</span><span class="st">|---|---|---|---|</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(s<span class="sc">$</span>suggestions)) {</span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    g <span class="ot">&lt;-</span> s<span class="sc">$</span>suggestions[[i]]</span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">&quot;| %d | %s%s | %s | %s |</span><span class="sc">\n</span><span class="st">&quot;</span>, i, g<span class="sc">$</span>text, <span class="cf">if</span> (<span class="fu">isTRUE</span>(g<span class="sc">$</span>recommended)) <span class="st">&quot;（推薦）&quot;</span> <span class="cf">else</span> <span class="st">&quot;&quot;</span>,</span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>                <span class="fu">mname</span>(g<span class="sc">$</span>analysis), g<span class="sc">$</span>reason))</span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">**使用者的選擇**：「%s」</span><span class="sc">\n\n</span><span class="st">&quot;</span>, s<span class="sc">$</span>choice))</span>
-<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (k <span class="cf">in</span> <span class="fu">seq_along</span>(slog<span class="sc">$</span>steps)) {</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  s <span class="ot">&lt;-</span> slog<span class="sc">$</span>steps[[k]]</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  d <span class="ot">&lt;-</span> <span class="fu">file.path</span>(sw, s<span class="sc">$</span>dir)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> jsonlite<span class="sc">::</span><span class="fu">read_json</span>(<span class="fu">file.path</span>(d, <span class="st">&quot;result.json&quot;</span>), <span class="at">simplifyVector =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  rep_lines <span class="ot">&lt;-</span> <span class="fu">read_lines</span>(<span class="fu">list.files</span>(d, <span class="st">&quot;^分析報告_.*</span><span class="sc">\\</span><span class="st">.md$&quot;</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span>])</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">## 第 %d 步：%s</span><span class="sc">\n\n</span><span class="st">&quot;</span>, k, s<span class="sc">$</span>question))</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">&quot;**方法**：%s　**為什麼做這一步**：%s</span><span class="sc">\n\n</span><span class="st">&quot;</span>, <span class="fu">mname</span>(res<span class="sc">$</span>method), s<span class="sc">$</span>reason))</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;**Skill 的報告**（階段 5–6）：</span><span class="sc">\n\n</span><span class="st">&quot;</span>)</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">section_of</span>(rep_lines, <span class="st">&quot;## 結論與解釋&quot;</span>), <span class="at">sep =</span> <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">&quot;</span><span class="sc">\n\n</span><span class="st">![](%s/%s){width=80%%}</span><span class="sc">\n\n</span><span class="st">&quot;</span>, d, <span class="fu">tail</span>(res<span class="sc">$</span>plots, <span class="dv">1</span>)))</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;**Skill 建議的下一步**（階段 7）：</span><span class="sc">\n\n</span><span class="st">| # | 建議 | 方法 | 理由 |</span><span class="sc">\n</span><span class="st">|---|---|---|---|</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(s<span class="sc">$</span>suggestions)) {</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>    g <span class="ot">&lt;-</span> s<span class="sc">$</span>suggestions[[i]]</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">&quot;| %d | %s%s | %s | %s |</span><span class="sc">\n</span><span class="st">&quot;</span>, i, g<span class="sc">$</span>text, <span class="cf">if</span> (<span class="fu">isTRUE</span>(g<span class="sc">$</span>recommended)) <span class="st">&quot;（推薦）&quot;</span> <span class="cf">else</span> <span class="st">&quot;&quot;</span>,</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>                <span class="fu">mname</span>(g<span class="sc">$</span>analysis), g<span class="sc">$</span>reason))</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">**使用者的選擇**：「%s」</span><span class="sc">\n\n</span><span class="st">&quot;</span>, s<span class="sc">$</span>choice))</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </section>
 <section id="第-1-步第一次和第三次考試的及格率一樣嗎" class="level2" data-number="8.4">
@@ -5794,10 +5897,10 @@ window.Quarto = {
 <p>使用者選「結束」後，Claude 寫好整體結論（<code>結論.md</code>），執行 <code>build_report.R</code>，產生 <code>整份分析報告_student_por.html</code>（單一檔案，用瀏覽器打開）。報告的章節：</p>
 <details class="code-fold">
 <summary>R code（點開查看）</summary>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>qmd_lines <span class="ot">&lt;-</span> <span class="fu">read_lines</span>(<span class="fu">file.path</span>(sw, <span class="st">&quot;整份分析報告_student_por.qmd&quot;</span>))</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>heads <span class="ot">&lt;-</span> <span class="fu">grep</span>(<span class="st">&quot;^#{1,2} &quot;</span>, qmd_lines, <span class="at">value =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>heads <span class="ot">&lt;-</span> heads[<span class="fu">seq_len</span>(<span class="fu">which</span>(heads <span class="sc">==</span> <span class="st">&quot;# 附錄：重現每一步的程式碼&quot;</span>))]</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sub</span>(<span class="st">&quot;^## &quot;</span>, <span class="st">&quot;    - &quot;</span>, <span class="fu">sub</span>(<span class="st">&quot;^# &quot;</span>, <span class="st">&quot;- &quot;</span>, heads)), <span class="at">sep =</span> <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>qmd_lines <span class="ot">&lt;-</span> <span class="fu">read_lines</span>(<span class="fu">file.path</span>(sw, <span class="st">&quot;整份分析報告_student_por.qmd&quot;</span>))</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>heads <span class="ot">&lt;-</span> <span class="fu">grep</span>(<span class="st">&quot;^#{1,2} &quot;</span>, qmd_lines, <span class="at">value =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>heads <span class="ot">&lt;-</span> heads[<span class="fu">seq_len</span>(<span class="fu">which</span>(heads <span class="sc">==</span> <span class="st">&quot;# 附錄：重現每一步的程式碼&quot;</span>))]</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sub</span>(<span class="st">&quot;^## &quot;</span>, <span class="st">&quot;    - &quot;</span>, <span class="fu">sub</span>(<span class="st">&quot;^# &quot;</span>, <span class="st">&quot;- &quot;</span>, heads)), <span class="at">sep =</span> <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <ul>
 <li>資料與研究問題</li>
@@ -5820,7 +5923,7 @@ window.Quarto = {
 <p>報告裡的數字都由程式從各步驟的結果放入；Claude 只寫解釋與結論的文字。最後的結論：</p>
 <details class="code-fold">
 <summary>R code（點開查看）</summary>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">section_of</span>(<span class="fu">read_lines</span>(<span class="fu">file.path</span>(sw, <span class="st">&quot;結論.md&quot;</span>)), <span class="st">&quot;## 研究問題的回答&quot;</span>), <span class="at">sep =</span> <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">section_of</span>(<span class="fu">read_lines</span>(<span class="fu">file.path</span>(sw, <span class="st">&quot;結論.md&quot;</span>)), <span class="st">&quot;## 研究問題的回答&quot;</span>), <span class="at">sep =</span> <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <ul>
 <li><strong>及格率有沒有改變</strong>：有證據顯示有改變。頭尾兩次相比，及格比例由 0.758 增加到 0.846（第 1 步）；三次一起看，第 3 次及格的勝算比第 1 次高（第 2、3 步）。</li>
@@ -5834,11 +5937,11 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>R code（點開查看）</summary>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>st_dir <span class="ot">&lt;-</span> <span class="st">&quot;dev/skill-test&quot;</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>judg <span class="ot">&lt;-</span> yaml<span class="sc">::</span><span class="fu">read_yaml</span>(<span class="fu">file.path</span>(st_dir, <span class="st">&quot;judgment.yml&quot;</span>))</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> jsonlite<span class="sc">::</span><span class="fu">read_json</span>(<span class="fu">file.path</span>(st_dir, <span class="st">&quot;verify_results.json&quot;</span>), <span class="at">simplifyVector =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>rd <span class="ot">&lt;-</span> <span class="cf">function</span>(q) jsonlite<span class="sc">::</span><span class="fu">read_json</span>(<span class="fu">file.path</span>(st_dir, <span class="st">&quot;outputs&quot;</span>, q, <span class="st">&quot;result.json&quot;</span>), <span class="at">simplifyVector =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>o1 <span class="ot">&lt;-</span> <span class="fu">rd</span>(<span class="st">&quot;q1b&quot;</span>); o2 <span class="ot">&lt;-</span> <span class="fu">rd</span>(<span class="st">&quot;q2&quot;</span>); o3 <span class="ot">&lt;-</span> <span class="fu">rd</span>(<span class="st">&quot;q3b&quot;</span>); o3c <span class="ot">&lt;-</span> <span class="fu">rd</span>(<span class="st">&quot;q3c&quot;</span>)</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>st_dir <span class="ot">&lt;-</span> <span class="st">&quot;dev/skill-test&quot;</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>judg <span class="ot">&lt;-</span> yaml<span class="sc">::</span><span class="fu">read_yaml</span>(<span class="fu">file.path</span>(st_dir, <span class="st">&quot;judgment.yml&quot;</span>))</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> jsonlite<span class="sc">::</span><span class="fu">read_json</span>(<span class="fu">file.path</span>(st_dir, <span class="st">&quot;verify_results.json&quot;</span>), <span class="at">simplifyVector =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>rd <span class="ot">&lt;-</span> <span class="cf">function</span>(q) jsonlite<span class="sc">::</span><span class="fu">read_json</span>(<span class="fu">file.path</span>(st_dir, <span class="st">&quot;outputs&quot;</span>, q, <span class="st">&quot;result.json&quot;</span>), <span class="at">simplifyVector =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>o1 <span class="ot">&lt;-</span> <span class="fu">rd</span>(<span class="st">&quot;q1b&quot;</span>); o2 <span class="ot">&lt;-</span> <span class="fu">rd</span>(<span class="st">&quot;q2&quot;</span>); o3 <span class="ot">&lt;-</span> <span class="fu">rd</span>(<span class="st">&quot;q3b&quot;</span>); o3c <span class="ot">&lt;-</span> <span class="fu">rd</span>(<span class="st">&quot;q3c&quot;</span>)</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <section id="情境" class="level2" data-number="9.1">
@@ -5861,7 +5964,7 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>R code（點開查看）</summary>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>b1 <span class="ot">&lt;-</span> o1<span class="sc">$</span>estimates</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>b1 <span class="ot">&lt;-</span> o1<span class="sc">$</span>estimates</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <ul>
@@ -5875,7 +5978,7 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>R code（點開查看）</summary>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>e2 <span class="ot">&lt;-</span> o2<span class="sc">$</span>estimates</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>e2 <span class="ot">&lt;-</span> o2<span class="sc">$</span>estimates</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <ul>
@@ -5888,8 +5991,8 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>R code（點開查看）</summary>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>e3 <span class="ot">&lt;-</span> o3<span class="sc">$</span>estimates</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="cf">function</span>(term, col) e3[e3<span class="sc">$</span>term <span class="sc">==</span> term, col]</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>e3 <span class="ot">&lt;-</span> o3<span class="sc">$</span>estimates</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="cf">function</span>(term, col) e3[e3<span class="sc">$</span>term <span class="sc">==</span> term, col]</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>這一題測了兩種回答：</p>
@@ -5899,9 +6002,9 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>R code（點開查看）</summary>
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">data.frame</span>(比較 <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;第 2 次 vs 第 1 次&quot;</span>, <span class="st">&quot;第 3 次 vs 第 1 次&quot;</span>, <span class="st">&quot;男 vs 女&quot;</span>),</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>                 <span class="st">`</span><span class="at">GEE 勝算比（整體來說）</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">f3</span>(e3<span class="sc">$</span>gee_or[<span class="sc">-</span><span class="dv">1</span>]), <span class="st">`</span><span class="at">GLMM 勝算比（對同一位學生）</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">f3</span>(e3<span class="sc">$</span>glmm_or[<span class="sc">-</span><span class="dv">1</span>]),</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">check.names =</span> <span class="cn">FALSE</span>))</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">data.frame</span>(比較 <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;第 2 次 vs 第 1 次&quot;</span>, <span class="st">&quot;第 3 次 vs 第 1 次&quot;</span>, <span class="st">&quot;男 vs 女&quot;</span>),</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>                 <span class="st">`</span><span class="at">GEE 勝算比（整體來說）</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">f3</span>(e3<span class="sc">$</span>gee_or[<span class="sc">-</span><span class="dv">1</span>]), <span class="st">`</span><span class="at">GLMM 勝算比（對同一位學生）</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">f3</span>(e3<span class="sc">$</span>glmm_or[<span class="sc">-</span><span class="dv">1</span>]),</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">check.names =</span> <span class="cn">FALSE</span>))</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -5952,13 +6055,13 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>R code（點開查看）</summary>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>jd <span class="ot">&lt;-</span> <span class="fu">vapply</span>(judg<span class="sc">$</span>questions, <span class="cf">function</span>(q) q<span class="sc">$</span>judgment<span class="sc">$</span>method_id, <span class="st">&quot;&quot;</span>)</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>sk <span class="ot">&lt;-</span> <span class="fu">c</span>(o1<span class="sc">$</span>method, o2<span class="sc">$</span>method, o3c<span class="sc">$</span>method, <span class="st">&quot;refer&quot;</span>)      <span class="co"># q4：Skill 確認資料獨立後轉介 Part 1，沒有輸出</span></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>part1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;crosstab&quot;</span>, <span class="st">&quot;trend&quot;</span>, <span class="st">&quot;stratified&quot;</span>, <span class="st">&quot;refer&quot;</span>)   <span class="co"># Part 1 的方法代號：轉介到 Part 1 即一致</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>ok <span class="ot">&lt;-</span> <span class="fu">c</span>(jd[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>] <span class="sc">==</span> sk[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>], sk[<span class="dv">4</span>] <span class="sc">==</span> <span class="st">&quot;refer&quot;</span> <span class="sc">&amp;&amp;</span> jd[<span class="dv">4</span>] <span class="sc">%in%</span> part1)</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">data.frame</span>(題目 <span class="ot">=</span> <span class="fu">vapply</span>(judg<span class="sc">$</span>questions, <span class="st">`</span><span class="at">[[</span><span class="st">`</span>, <span class="st">&quot;&quot;</span>, <span class="st">&quot;question&quot;</span>), 人為判斷 <span class="ot">=</span> jd,</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">Skill =</span> <span class="fu">c</span>(sk[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>], <span class="st">&quot;轉介 Part 1&quot;</span>), 一致 <span class="ot">=</span> <span class="fu">ifelse</span>(ok, <span class="st">&quot;✅&quot;</span>, <span class="st">&quot;❌&quot;</span>)),</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> <span class="st">&quot;方法：人為判斷 vs Skill（q3 為只要整體效果的版本；q4 的人為判斷是 Part 1 的方法，Skill 轉介到 Part 1 即一致）&quot;</span>)</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>jd <span class="ot">&lt;-</span> <span class="fu">vapply</span>(judg<span class="sc">$</span>questions, <span class="cf">function</span>(q) q<span class="sc">$</span>judgment<span class="sc">$</span>method_id, <span class="st">&quot;&quot;</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>sk <span class="ot">&lt;-</span> <span class="fu">c</span>(o1<span class="sc">$</span>method, o2<span class="sc">$</span>method, o3c<span class="sc">$</span>method, <span class="st">&quot;refer&quot;</span>)      <span class="co"># q4：Skill 確認資料獨立後轉介 Part 1，沒有輸出</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>part1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;crosstab&quot;</span>, <span class="st">&quot;trend&quot;</span>, <span class="st">&quot;stratified&quot;</span>, <span class="st">&quot;refer&quot;</span>)   <span class="co"># Part 1 的方法代號：轉介到 Part 1 即一致</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>ok <span class="ot">&lt;-</span> <span class="fu">c</span>(jd[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>] <span class="sc">==</span> sk[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>], sk[<span class="dv">4</span>] <span class="sc">==</span> <span class="st">&quot;refer&quot;</span> <span class="sc">&amp;&amp;</span> jd[<span class="dv">4</span>] <span class="sc">%in%</span> part1)</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">data.frame</span>(題目 <span class="ot">=</span> <span class="fu">vapply</span>(judg<span class="sc">$</span>questions, <span class="st">`</span><span class="at">[[</span><span class="st">`</span>, <span class="st">&quot;&quot;</span>, <span class="st">&quot;question&quot;</span>), 人為判斷 <span class="ot">=</span> jd,</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">Skill =</span> <span class="fu">c</span>(sk[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>], <span class="st">&quot;轉介 Part 1&quot;</span>), 一致 <span class="ot">=</span> <span class="fu">ifelse</span>(ok, <span class="st">&quot;✅&quot;</span>, <span class="st">&quot;❌&quot;</span>)),</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> <span class="st">&quot;方法：人為判斷 vs Skill（q3 為只要整體效果的版本；q4 的人為判斷是 Part 1 的方法，Skill 轉介到 Part 1 即一致）&quot;</span>)</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -6009,18 +6112,18 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>R code（點開查看）</summary>
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>chk <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(項目 <span class="ot">=</span> <span class="st">&quot;q1 β̂&quot;</span>, <span class="at">Skill =</span> o1<span class="sc">$</span>estimates<span class="sc">$</span>estimate[<span class="dv">1</span>], 驗證 <span class="ot">=</span> v<span class="sc">$</span>q1<span class="sc">$</span>beta),</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(項目 <span class="ot">=</span> <span class="st">&quot;q1 robust SE&quot;</span>, <span class="at">Skill =</span> o1<span class="sc">$</span>estimates<span class="sc">$</span>se[<span class="dv">1</span>], 驗證 <span class="ot">=</span> v<span class="sc">$</span>q1<span class="sc">$</span>robust_se),</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(項目 <span class="ot">=</span> <span class="st">&quot;q2 LR&quot;</span>, <span class="at">Skill =</span> o2<span class="sc">$</span>tests<span class="sc">$</span>statistic[<span class="dv">1</span>], 驗證 <span class="ot">=</span> v<span class="sc">$</span>q2<span class="sc">$</span>lr),</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(項目 <span class="ot">=</span> <span class="st">&quot;q2 CMH&quot;</span>, <span class="at">Skill =</span> o2<span class="sc">$</span>tests<span class="sc">$</span>statistic[<span class="fu">grepl</span>(<span class="st">&quot;CMH&quot;</span>, o2<span class="sc">$</span>tests<span class="sc">$</span>test)], 驗證 <span class="ot">=</span> v<span class="sc">$</span>q2<span class="sc">$</span>cmh),</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(項目 <span class="ot">=</span> <span class="st">&quot;q3 GEE sexM&quot;</span>, <span class="at">Skill =</span> o3c<span class="sc">$</span>estimates<span class="sc">$</span>estimate[o3c<span class="sc">$</span>estimates<span class="sc">$</span>term <span class="sc">==</span> <span class="st">&quot;sexM&quot;</span>], 驗證 <span class="ot">=</span> v<span class="sc">$</span>q3<span class="sc">$</span>gee<span class="sc">$</span>coef<span class="sc">$</span>sexM),</span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(項目 <span class="ot">=</span> <span class="st">&quot;q3 GEE sexM SE&quot;</span>, <span class="at">Skill =</span> o3c<span class="sc">$</span>estimates<span class="sc">$</span>se[o3c<span class="sc">$</span>estimates<span class="sc">$</span>term <span class="sc">==</span> <span class="st">&quot;sexM&quot;</span>], 驗證 <span class="ot">=</span> v<span class="sc">$</span>q3<span class="sc">$</span>gee<span class="sc">$</span>robust_se<span class="sc">$</span>sexM),</span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(項目 <span class="ot">=</span> <span class="st">&quot;q3 GLMM period3&quot;</span>, <span class="at">Skill =</span> <span class="fu">k</span>(<span class="st">&quot;period3&quot;</span>, <span class="st">&quot;glmm_estimate&quot;</span>), 驗證 <span class="ot">=</span> v<span class="sc">$</span>q3<span class="sc">$</span>glmm<span class="sc">$</span>coef<span class="sc">$</span>period3),</span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(項目 <span class="ot">=</span> <span class="st">&quot;q3 GLMM sexM SE&quot;</span>, <span class="at">Skill =</span> <span class="fu">k</span>(<span class="st">&quot;sexM&quot;</span>, <span class="st">&quot;glmm_se&quot;</span>), 驗證 <span class="ot">=</span> v<span class="sc">$</span>q3<span class="sc">$</span>glmm<span class="sc">$</span>se<span class="sc">$</span>sexM))</span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>chk<span class="sc">$</span>一致 <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">abs</span>(chk<span class="sc">$</span>Skill <span class="sc">-</span> chk<span class="sc">$</span>驗證) <span class="sc">&lt;</span> <span class="fl">1e-4</span>, <span class="st">&quot;✅&quot;</span>, <span class="st">&quot;❌&quot;</span>)</span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>chk<span class="sc">$</span>Skill <span class="ot">&lt;-</span> <span class="fu">formatC</span>(chk<span class="sc">$</span>Skill, <span class="at">digits =</span> <span class="dv">5</span>, <span class="at">format =</span> <span class="st">&quot;f&quot;</span>); chk<span class="sc">$</span>驗證 <span class="ot">&lt;-</span> <span class="fu">formatC</span>(chk<span class="sc">$</span>驗證, <span class="at">digits =</span> <span class="dv">5</span>, <span class="at">format =</span> <span class="st">&quot;f&quot;</span>)</span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(chk, <span class="at">caption =</span> <span class="st">&quot;數字：Skill 的 result.json vs 獨立驗證（verify.R，不使用 Skill 的程式）&quot;</span>)</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>chk <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(項目 <span class="ot">=</span> <span class="st">&quot;q1 β̂&quot;</span>, <span class="at">Skill =</span> o1<span class="sc">$</span>estimates<span class="sc">$</span>estimate[<span class="dv">1</span>], 驗證 <span class="ot">=</span> v<span class="sc">$</span>q1<span class="sc">$</span>beta),</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(項目 <span class="ot">=</span> <span class="st">&quot;q1 robust SE&quot;</span>, <span class="at">Skill =</span> o1<span class="sc">$</span>estimates<span class="sc">$</span>se[<span class="dv">1</span>], 驗證 <span class="ot">=</span> v<span class="sc">$</span>q1<span class="sc">$</span>robust_se),</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(項目 <span class="ot">=</span> <span class="st">&quot;q2 LR&quot;</span>, <span class="at">Skill =</span> o2<span class="sc">$</span>tests<span class="sc">$</span>statistic[<span class="dv">1</span>], 驗證 <span class="ot">=</span> v<span class="sc">$</span>q2<span class="sc">$</span>lr),</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(項目 <span class="ot">=</span> <span class="st">&quot;q2 CMH&quot;</span>, <span class="at">Skill =</span> o2<span class="sc">$</span>tests<span class="sc">$</span>statistic[<span class="fu">grepl</span>(<span class="st">&quot;CMH&quot;</span>, o2<span class="sc">$</span>tests<span class="sc">$</span>test)], 驗證 <span class="ot">=</span> v<span class="sc">$</span>q2<span class="sc">$</span>cmh),</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(項目 <span class="ot">=</span> <span class="st">&quot;q3 GEE sexM&quot;</span>, <span class="at">Skill =</span> o3c<span class="sc">$</span>estimates<span class="sc">$</span>estimate[o3c<span class="sc">$</span>estimates<span class="sc">$</span>term <span class="sc">==</span> <span class="st">&quot;sexM&quot;</span>], 驗證 <span class="ot">=</span> v<span class="sc">$</span>q3<span class="sc">$</span>gee<span class="sc">$</span>coef<span class="sc">$</span>sexM),</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(項目 <span class="ot">=</span> <span class="st">&quot;q3 GEE sexM SE&quot;</span>, <span class="at">Skill =</span> o3c<span class="sc">$</span>estimates<span class="sc">$</span>se[o3c<span class="sc">$</span>estimates<span class="sc">$</span>term <span class="sc">==</span> <span class="st">&quot;sexM&quot;</span>], 驗證 <span class="ot">=</span> v<span class="sc">$</span>q3<span class="sc">$</span>gee<span class="sc">$</span>robust_se<span class="sc">$</span>sexM),</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(項目 <span class="ot">=</span> <span class="st">&quot;q3 GLMM period3&quot;</span>, <span class="at">Skill =</span> <span class="fu">k</span>(<span class="st">&quot;period3&quot;</span>, <span class="st">&quot;glmm_estimate&quot;</span>), 驗證 <span class="ot">=</span> v<span class="sc">$</span>q3<span class="sc">$</span>glmm<span class="sc">$</span>coef<span class="sc">$</span>period3),</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(項目 <span class="ot">=</span> <span class="st">&quot;q3 GLMM sexM SE&quot;</span>, <span class="at">Skill =</span> <span class="fu">k</span>(<span class="st">&quot;sexM&quot;</span>, <span class="st">&quot;glmm_se&quot;</span>), 驗證 <span class="ot">=</span> v<span class="sc">$</span>q3<span class="sc">$</span>glmm<span class="sc">$</span>se<span class="sc">$</span>sexM))</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>chk<span class="sc">$</span>一致 <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">abs</span>(chk<span class="sc">$</span>Skill <span class="sc">-</span> chk<span class="sc">$</span>驗證) <span class="sc">&lt;</span> <span class="fl">1e-4</span>, <span class="st">&quot;✅&quot;</span>, <span class="st">&quot;❌&quot;</span>)</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>chk<span class="sc">$</span>Skill <span class="ot">&lt;-</span> <span class="fu">formatC</span>(chk<span class="sc">$</span>Skill, <span class="at">digits =</span> <span class="dv">5</span>, <span class="at">format =</span> <span class="st">&quot;f&quot;</span>); chk<span class="sc">$</span>驗證 <span class="ot">&lt;-</span> <span class="fu">formatC</span>(chk<span class="sc">$</span>驗證, <span class="at">digits =</span> <span class="dv">5</span>, <span class="at">format =</span> <span class="st">&quot;f&quot;</span>)</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(chk, <span class="at">caption =</span> <span class="st">&quot;數字：Skill 的 result.json vs 獨立驗證（verify.R，不使用 Skill 的程式）&quot;</span>)</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">

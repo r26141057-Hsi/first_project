@@ -21,7 +21,7 @@ suppressPackageStartupMessages(library(knitr))
 skill_dir <- "categorical-correlated"
 for (f in c("utils.R", setdiff(list.files(file.path(skill_dir, "R"), pattern = "\\.R$"), "utils.R")))
   source(file.path(skill_dir, "R", f), encoding = "UTF-8")
-demo <- read_data("dev/demo/student_por.csv")
+demo <- read_data("data/student_por.csv")
 prof <- cc_profile(demo)
 ```
 
@@ -56,7 +56,8 @@ prof <- cc_profile(demo)
 2. **選對方法**：依「只比較兩次」還是「有解釋變數」、結果是二元／名目／有序、要哪一種效果，選課本第 8–10 章的方法。
 3. **數字都由程式算**，而且和課本一致。
 4. **說對話**：GEE 說「整體來說」、GLMM 說「對同一個人」，兩者不同時能解釋為什麼。
-5. **和組員的 Skill 接得起來**：同一份示範資料、同樣的流程與輸出格式。
+5. **一步一步分析，由使用者決定**：每做完一步就報告結果、建議下一步，要做什麼由使用者選；結束時把整個過程整理成一份報告。
+6. **和組員的 Skill 接得起來**：同一份示範資料、同樣的流程與輸出格式。
 
 ## Skill 是什麼？
 
@@ -66,12 +67,23 @@ Claude Skill 是一個資料夾：`SKILL.md` 告訴 Claude 什麼時候用、怎
 categorical-correlated/
 ├── SKILL.md                    流程、規則、用語
 ├── references/
-│   ├── decision-tree.md        選方法的決策樹
+│   ├── decision-tree.md        選方法的決策樹，以及每一步之後可以建議什麼
 │   ├── checklist.md            注意事項清單（20 條、13 個警告代碼）
 │   ├── methods.md              每個方法的 R 程式碼（都用課本例子驗證過）
 │   └── textbook-methods.md     第 8–10 章的公式與觀念
 ├── R/                          計算引擎（R 版，模式 1）
-└── scripts/                    各階段的腳本（R 與 Python 版）
+└── scripts/                    各階段的腳本（R 與 Python 版），含產生整份報告的 build_report
+```
+
+分析時 Skill 把每一步的結果存在資料旁邊的 `output/`：
+
+```
+output/
+├── 資料總覽_<資料>.md、初步檢視_<資料>.md、圖
+├── step1/、step2/、…          每一步的分析報告、result.json、重現程式碼
+├── analysis_log.json           每一步為什麼做、Skill 的建議、使用者的選擇（不放數字）
+├── 結論.md                     Claude 寫的整體結論
+└── 整份分析報告_<資料>.html     最後產生的整份報告
 ```
 
 ## 怎麼運作？
@@ -82,10 +94,27 @@ categorical-correlated/
 | 2 確認清單 | 一則訊息列出所有設定（附預設值與理由）與推薦的方法 | 停：等使用者回覆 |
 | 3 依問題畫圖 | 配對次數表、兩次的分布；或各時間點的比例 | 不停 |
 | 4 判斷適不適合 | 依注意事項清單標示 ✅／⚠️／❌ | 停：等使用者 OK |
-| 5 執行分析 | 程式計算、畫圖、產生報告 | |
-| 6 解釋結果 | 固定段落＋用語規則，補進報告檔 | |
+| 5 執行分析 | 程式計算、畫圖，結果存到 `step<K>/` | |
+| 6 解釋結果 | 固定段落＋用語規則，補進這一步的報告檔 | |
+| 7 建議下一步 | 依課本建議最多 3 個下一步，各附理由與節號，最後一個固定是「結束」 | 停：**由使用者選擇**（或自己提出） |
+| 7a 簡短確認 | 只列和上一步不同的設定＋ ✅／⚠️／❌ | 停：等使用者 OK，回到階段 5 |
+| 8 整份分析報告 | Claude 寫結論；程式把每一步的結果、建議與選擇合成一份 Quarto HTML | |
 
-骨架沿用 Part 1 的「每個階段停下來」，階段 2 用 Part 2 的「一則訊息確認清單」。
+```{mermaid}
+flowchart LR
+  A["1–4 資料總覽、確認清單<br/>畫圖、判斷適不適合"] --> B["5–6 計算、解釋"]
+  B --> C{"7 建議下一步"}
+  C -->|使用者選一個| D["7a 簡短確認"] --> B
+  C -->|使用者選結束| E["8 整份分析報告"]
+```
+
+骨架沿用 Part 1 的「每個階段停下來」，階段 2 用 Part 2 的「一則訊息確認清單」。階段 7–8 參考老師檢查過的兩份 Skill（cluster-survival-r、glm-analysis）：**一筆資料從頭分析到尾，每一步報告結果、給建議，但做什麼由使用者決定**，最後產生一份完整報告。
+
+設計時的三個重點：
+
+- **建議不只看 P 值**：例如交互作用不顯著時，「拿掉交互作用」只是選項之一；「整體平均或同一個人」由使用者的問題決定，不由檢定決定。
+- **改了根本的設定就重新確認**：結果變數、叢集單位、類別順序或切分門檻改了，回到階段 2；只換方法或解釋變數，用簡短確認。
+- **整份報告不重新計算**：`build_report` 只讀每一步已經存好的結果；`analysis_log.json` 只記錄判斷與選擇，不放數字，所以報告上的數字一定來自程式。
 
 ### 階段 1 會找什麼？
 
@@ -117,6 +146,15 @@ flowchart TD
   Q3 -->|同一個人| B3["GLMM §10.1–10.2"]
   Q3 -->|兩者| B4["並排 §10.1.4"]
 ```
+
+做完一步之後，決策樹的 Q4 告訴 Skill 可以建議什麼（節錄）：
+
+| 做完的分析 | 可以建議的下一步 | 理由 |
+|---|---|---|
+| McNemar | GEE：超過兩次，或要加解釋變數 | McNemar 只能比兩次、不能加解釋變數（§8.1 → §9.2） |
+| GEE | GLMM 或兩者並排：也想知道同一個人的效果 | 兩種效果回答不同的問題（§10.1.4） |
+| GEE | 換 working correlation 做敏感度比較 | robust SE 不依賴 working correlation（§9.2.2） |
+| 任何模型 | 加或拿掉解釋變數、交互作用 | 依使用者的問題 |
 
 ### 注意事項清單（節錄）
 
@@ -154,26 +192,45 @@ Windows 上 `Rscript` 不在 PATH 時，Skill 會自己去找 `C:\Program Files\
 - Python 版是 R 版逐行對照改寫的，自動測試逐項比對兩邊的數字、警告與結論句，結果相同。
 - **Python 版不做 GLMM**（statsmodels 沒有和 R 相同的估計方法，數字會和課本對不上）。需要 GLMM 時，Skill 會把 `methods.md` 的 R 程式碼交給使用者在 RStudio 執行。
 
-### 跟著做：要貼給 Claude 的話
+### 跟著做：第一個指令
 
-每一題開一個新對話，上傳 `student_por.csv`：
+示範資料放在 Part3 的 `data/` 資料夾（`data/student_por.csv`，欄位說明見 `data/README.md`）。在 Part3 資料夾開啟 Claude Code，輸入：
+
+```text
+請用 categorical-correlated skill 分析 data/student_por.csv：學生三次考試的及格率有沒有改變？和性別有關嗎？
+```
+
+claude.ai 網頁版：先上傳 `student_por.csv`，指令改成「分析 student_por.csv」。
+
+接下來 Skill 會：
+
+1. 給資料總覽，指出 `G1`／`G2`／`G3` 等可能不獨立的線索；
+2. 用一則訊息列出確認清單（同一位學生、幾分算及格、要整體平均還是同一個人的效果……），**每一項由你回答**，同意預設就回覆「照預設」；
+3. 畫圖、判斷方法適不適合，等你回覆「用推薦的」；
+4. 計算、解釋，然後建議最多 3 個下一步，**由你選**（例如「選 1」），也可以自己提出；
+5. 你回覆「結束」時，產生 `data/output/整份分析報告_student_por.html`。
+
+Part 3 報告頁第 8 章就是用同一句指令走完的一次示範（選擇由開發者模擬）。
+
+### 其他可以試的問題
+
+每一題開一個新對話：
 
 | 開場訊息 | Skill 停下來時回答 | 預期 |
 |---|---|---|
-| 請用 categorical-correlated skill 分析 student_por.csv：學生平日和週末的喝酒程度一樣嗎？ | Dalc、Walc 是同一位學生的平日、週末喝酒程度；1 < 2 < 3 < 4 < 5；其他照預設 → 用推薦的 | 有序配對；週末較高 |
-| 請用 categorical-correlated skill 分析 student_por.csv：媽媽和爸爸的職業分布不同嗎？ | Mjob、Fjob 是同一位學生的媽媽、爸爸職業；沒有順序；其他照預設 → 用推薦的 | 名目配對；媽媽較多「在家」 |
-| 請用 categorical-correlated skill 分析 student_por.csv：三次考試的及格率有變化嗎？和性別有關嗎？ | G1–G3 是同一位學生三次成績；10 分以上及格；我只想知道整體；其他照預設 → 用推薦的；再問「可以用概似比檢定比較 GEE 模型嗎？」 | GEE；說明 GEE 沒有概似函數 |
-| 請用 categorical-correlated skill 分析 student_por.csv：有沒有上付費補習，和想不想讀大學有關嗎？ | 每一列是不同的學生 | 轉介 Part 1 |
+| 請用 categorical-correlated skill 分析 data/student_por.csv：學生平日和週末的喝酒程度一樣嗎？ | Dalc、Walc 是同一位學生的平日、週末喝酒程度；1 < 2 < 3 < 4 < 5；其他照預設 → 用推薦的 | 有序配對；週末較高 |
+| 請用 categorical-correlated skill 分析 data/student_por.csv：媽媽和爸爸的職業分布不同嗎？ | Mjob、Fjob 是同一位學生的媽媽、爸爸職業；沒有順序；其他照預設 → 用推薦的 | 名目配對；媽媽較多「在家」 |
+| 請用 categorical-correlated skill 分析 data/student_por.csv：有沒有上付費補習，和想不想讀大學有關嗎？ | 每一列是不同的學生 | 轉介 Part 1 |
 
 ## 合不合理？三層驗證
 
 | 層次 | 怎麼做 | 結果 |
 |---|---|---|
 | 1. 課本 | 從書中印出的表格重建 7 個例子（Table 8.1、8.5、8.6、9.1、9.2、10.1、罰球），每個方法的數字和課本比對（`dev/test_engine.R`） | 70 / 70 |
-| 2. Python 備案 | Python 版和課本比對、和 R 版逐項比對數字、警告、結論句（`dev/test_python.py`） | 57 / 57 |
+| 2. Python 備案 | Python 版和課本比對、和 R 版逐項比對數字、警告、結論句；整份報告的 R 版與 Python 版輸出一致（`dev/test_python.py`） | 62 / 62 |
 | 3. 真實資料 | 先寫人為判斷（`judgment.yml`），再在全新的 Claude 對話中實測；數字和不使用 Skill 程式的獨立驗證（`verify.R`）比對 | 方法 4 / 4、數字全部一致 |
 
-真實資料實測的詳細結果與比對表，見 Part 3 報告頁的「Skill 應用示範」。
+真實資料實測的詳細結果與比對表，見 Part 3 報告頁的「Skill 的驗證」；逐步分析的完整示範見「Skill 應用示範」。
 
 ## 開發過程：AI 怎麼幫忙、我們怎麼決定
 
@@ -189,6 +246,8 @@ Windows 上 `Rscript` 不在 PATH 時，Skill 會自己去找 `C:\Program Files\
 | 知識 | 先寫 `references/`，每段 R 程式碼都跑課本例子驗證 | AI 寫、對照課本 |
 | 人為判斷 | `judgment.yml` 由組員依課本填寫，AI 只檢查格式與節號是否對得上 | 組員 |
 | 實測 | 兩輪新對話實測，發現問題後修正再測 | 組員回覆、AI 整理 |
+| 逐步分析 | 參考老師檢查過的兩份 Skill，改成每一步建議下一步、由使用者決定，最後產生整份報告；AI 先寫設計稿（`流程設計-逐步分析.md`）再實作 | 組員核可設計 |
+| 上課示範 | 加入 `data/` 資料夾、AI 的決策樹與第一個指令（沿用報告第 8 章的問題） | 組員提出需求、AI 提議指令 |
 
 開發過程中發現、而且改掉的問題（這些也是我們學到的地方）：
 
@@ -198,6 +257,7 @@ Windows 上 `Rscript` 不在 PATH 時，Skill 會自己去找 `C:\Program Files\
 4. **Python 版的 SE 差了 0.00007**：multgee 的 sandwich SE 用期望訊息矩陣（expected information），一開始用觀察訊息矩陣（observed）。改了之後完全一致。
 5. **實測時 Claude 自己取倒數**：程式只輸出「平日 vs 週末」的勝算比 0.254，Claude 為了回答「週末 vs 平日」自己算 1/0.254。改成程式直接輸出兩個方向。
 6. **加入交互作用後兩種檢定意義不同**：GLMM 拿掉主效果時連交互作用一起拿掉，GEE 沒有；實測中的 Claude 自己發現並說明了，我們把 GEE 改成一致。
+7. **整份報告重複資訊**：每一步的報告開頭都有資料檔、方法等欄位，合成整份報告時重複出現；改成由 `build_report` 拿掉這幾行，方法改在每一步的標題下說明一次。
 
 完整紀錄見 `dev/ai-log.csv`。
 
@@ -209,6 +269,8 @@ Windows 上 `Rscript` 不在 PATH 時，Skill 會自己去找 `C:\Program Files\
 - Python 版不做 GLMM，也不做 `ar1`、`unstructured` 的 working correlation（估計方式和 R 不同）。
 - 比例勝算假設沒有正式檢定；缺失資料只提醒，不做多重插補。
 - 評分者一致性（Kappa，§8.5）、Bradley–Terry（§8.6）不在範圍內。
+- 逐步分析目前只用開發者模擬的選擇測試過，還沒有由真人在新對話中完整走過一次。
+- 整份報告只輸出 HTML；沒有 Quarto 時改輸出 Markdown。
 
 ## 參考文獻
 

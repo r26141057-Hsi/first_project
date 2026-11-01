@@ -4671,7 +4671,8 @@ z-index: 1000;
   <li><a href="#怎麼用" id="toc-怎麼用" class="nav-link" data-scroll-target="#怎麼用">怎麼用？</a>
   <ul class="collapse">
   <li><a href="#安裝" id="toc-安裝" class="nav-link" data-scroll-target="#安裝">安裝</a></li>
-  <li><a href="#跟著做要貼給-claude-的話" id="toc-跟著做要貼給-claude-的話" class="nav-link" data-scroll-target="#跟著做要貼給-claude-的話">跟著做：要貼給 Claude 的話</a></li>
+  <li><a href="#跟著做第一個指令" id="toc-跟著做第一個指令" class="nav-link" data-scroll-target="#跟著做第一個指令">跟著做：第一個指令</a></li>
+  <li><a href="#其他可以試的問題" id="toc-其他可以試的問題" class="nav-link" data-scroll-target="#其他可以試的問題">其他可以試的問題</a></li>
   </ul></li>
   <li><a href="#合不合理三層驗證" id="toc-合不合理三層驗證" class="nav-link" data-scroll-target="#合不合理三層驗證">合不合理？三層驗證</a></li>
   <li><a href="#開發過程ai-怎麼幫忙我們怎麼決定" id="toc-開發過程ai-怎麼幫忙我們怎麼決定" class="nav-link" data-scroll-target="#開發過程ai-怎麼幫忙我們怎麼決定">開發過程：AI 怎麼幫忙、我們怎麼決定</a></li>
@@ -4735,6 +4736,7 @@ z-index: 1000;
 <li><strong>選對方法</strong>：依「只比較兩次」還是「有解釋變數」、結果是二元／名目／有序、要哪一種效果，選課本第 8–10 章的方法。</li>
 <li><strong>數字都由程式算</strong>，而且和課本一致。</li>
 <li><strong>說對話</strong>：GEE 說「整體來說」、GLMM 說「對同一個人」，兩者不同時能解釋為什麼。</li>
+<li><strong>一步一步分析，由使用者決定</strong>：每做完一步就報告結果、建議下一步，要做什麼由使用者選；結束時把整個過程整理成一份報告。</li>
 <li><strong>和組員的 Skill 接得起來</strong>：同一份示範資料、同樣的流程與輸出格式。</li>
 </ol>
 </section>
@@ -4744,12 +4746,19 @@ z-index: 1000;
 <pre><code>categorical-correlated/
 ├── SKILL.md                    流程、規則、用語
 ├── references/
-│   ├── decision-tree.md        選方法的決策樹
+│   ├── decision-tree.md        選方法的決策樹，以及每一步之後可以建議什麼
 │   ├── checklist.md            注意事項清單（20 條、13 個警告代碼）
 │   ├── methods.md              每個方法的 R 程式碼（都用課本例子驗證過）
 │   └── textbook-methods.md     第 8–10 章的公式與觀念
 ├── R/                          計算引擎（R 版，模式 1）
-└── scripts/                    各階段的腳本（R 與 Python 版）</code></pre>
+└── scripts/                    各階段的腳本（R 與 Python 版），含產生整份報告的 build_report</code></pre>
+<p>分析時 Skill 把每一步的結果存在資料旁邊的 <code>output/</code>：</p>
+<pre><code>output/
+├── 資料總覽_&lt;資料&gt;.md、初步檢視_&lt;資料&gt;.md、圖
+├── step1/、step2/、…          每一步的分析報告、result.json、重現程式碼
+├── analysis_log.json           每一步為什麼做、Skill 的建議、使用者的選擇（不放數字）
+├── 結論.md                     Claude 寫的整體結論
+└── 整份分析報告_&lt;資料&gt;.html     最後產生的整份報告</code></pre>
 </section>
 <section id="怎麼運作" class="level2">
 <h2 class="anchored" data-anchor-id="怎麼運作">怎麼運作？</h2>
@@ -4789,25 +4798,62 @@ z-index: 1000;
 </tr>
 <tr class="odd">
 <td>5 執行分析</td>
-<td>程式計算、畫圖、產生報告</td>
+<td>程式計算、畫圖，結果存到 <code>step&lt;K&gt;/</code></td>
 <td></td>
 </tr>
 <tr class="even">
 <td>6 解釋結果</td>
-<td>固定段落＋用語規則，補進報告檔</td>
+<td>固定段落＋用語規則，補進這一步的報告檔</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>7 建議下一步</td>
+<td>依課本建議最多 3 個下一步，各附理由與節號，最後一個固定是「結束」</td>
+<td>停：<strong>由使用者選擇</strong>（或自己提出）</td>
+</tr>
+<tr class="even">
+<td>7a 簡短確認</td>
+<td>只列和上一步不同的設定＋ ✅／⚠️／❌</td>
+<td>停：等使用者 OK，回到階段 5</td>
+</tr>
+<tr class="odd">
+<td>8 整份分析報告</td>
+<td>Claude 寫結論；程式把每一步的結果、建議與選擇合成一份 Quarto HTML</td>
 <td></td>
 </tr>
 </tbody>
 </table>
-<p>骨架沿用 Part 1 的「每個階段停下來」，階段 2 用 Part 2 的「一則訊息確認清單」。</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+  A[&quot;1–4 資料總覽、確認清單&lt;br/&gt;畫圖、判斷適不適合&quot;] --&gt; B[&quot;5–6 計算、解釋&quot;]
+  B --&gt; C{&quot;7 建議下一步&quot;}
+  C --&gt;|使用者選一個| D[&quot;7a 簡短確認&quot;] --&gt; B
+  C --&gt;|使用者選結束| E[&quot;8 整份分析報告&quot;]
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>骨架沿用 Part 1 的「每個階段停下來」，階段 2 用 Part 2 的「一則訊息確認清單」。階段 7–8 參考老師檢查過的兩份 Skill（cluster-survival-r、glm-analysis）：<strong>一筆資料從頭分析到尾，每一步報告結果、給建議，但做什麼由使用者決定</strong>，最後產生一份完整報告。</p>
+<p>設計時的三個重點：</p>
+<ul>
+<li><strong>建議不只看 P 值</strong>：例如交互作用不顯著時，「拿掉交互作用」只是選項之一；「整體平均或同一個人」由使用者的問題決定，不由檢定決定。</li>
+<li><strong>改了根本的設定就重新確認</strong>：結果變數、叢集單位、類別順序或切分門檻改了，回到階段 2；只換方法或解釋變數，用簡短確認。</li>
+<li><strong>整份報告不重新計算</strong>：<code>build_report</code> 只讀每一步已經存好的結果；<code>analysis_log.json</code> 只記錄判斷與選擇，不放數字，所以報告上的數字一定來自程式。</li>
+</ul>
 <section id="階段-1-會找什麼" class="level3">
 <h3 class="anchored" data-anchor-id="階段-1-會找什麼">階段 1 會找什麼？</h3>
 <p>程式會找出「可能不獨立」的線索，但<strong>每一條都要使用者確認</strong>。用示範資料 <code>student_por.csv</code> 跑一次（以下由程式產生）：</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>h <span class="ot">&lt;-</span> prof<span class="sc">$</span>structure<span class="sc">$</span>hints</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">data.frame</span>(線索 <span class="ot">=</span> <span class="fu">vapply</span>(h, <span class="st">`</span><span class="at">[[</span><span class="st">`</span>, <span class="st">&quot;&quot;</span>, <span class="st">&quot;type&quot;</span>),</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                 欄位 <span class="ot">=</span> <span class="fu">vapply</span>(h, <span class="cf">function</span>(x) <span class="fu">paste</span>(x<span class="sc">$</span>columns, <span class="at">collapse =</span> <span class="st">&quot;、&quot;</span>), <span class="st">&quot;&quot;</span>),</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                 要問使用者 <span class="ot">=</span> <span class="fu">vapply</span>(h, <span class="st">`</span><span class="at">[[</span><span class="st">`</span>, <span class="st">&quot;&quot;</span>, <span class="st">&quot;question&quot;</span>)), <span class="at">caption =</span> <span class="st">&quot;student_por.csv 的階段 1 線索&quot;</span>)</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>h <span class="ot">&lt;-</span> prof<span class="sc">$</span>structure<span class="sc">$</span>hints</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">data.frame</span>(線索 <span class="ot">=</span> <span class="fu">vapply</span>(h, <span class="st">`</span><span class="at">[[</span><span class="st">`</span>, <span class="st">&quot;&quot;</span>, <span class="st">&quot;type&quot;</span>),</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                 欄位 <span class="ot">=</span> <span class="fu">vapply</span>(h, <span class="cf">function</span>(x) <span class="fu">paste</span>(x<span class="sc">$</span>columns, <span class="at">collapse =</span> <span class="st">&quot;、&quot;</span>), <span class="st">&quot;&quot;</span>),</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                 要問使用者 <span class="ot">=</span> <span class="fu">vapply</span>(h, <span class="st">`</span><span class="at">[[</span><span class="st">`</span>, <span class="st">&quot;&quot;</span>, <span class="st">&quot;question&quot;</span>)), <span class="at">caption =</span> <span class="st">&quot;student_por.csv 的階段 1 線索&quot;</span>)</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>student_por.csv 的階段 1 線索</caption>
@@ -4877,6 +4923,43 @@ z-index: 1000;
 </div>
 </div>
 </div>
+<p>做完一步之後，決策樹的 Q4 告訴 Skill 可以建議什麼（節錄）：</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>做完的分析</th>
+<th>可以建議的下一步</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>McNemar</td>
+<td>GEE：超過兩次，或要加解釋變數</td>
+<td>McNemar 只能比兩次、不能加解釋變數（§8.1 → §9.2）</td>
+</tr>
+<tr class="even">
+<td>GEE</td>
+<td>GLMM 或兩者並排：也想知道同一個人的效果</td>
+<td>兩種效果回答不同的問題（§10.1.4）</td>
+</tr>
+<tr class="odd">
+<td>GEE</td>
+<td>換 working correlation 做敏感度比較</td>
+<td>robust SE 不依賴 working correlation（§9.2.2）</td>
+</tr>
+<tr class="even">
+<td>任何模型</td>
+<td>加或拿掉解釋變數、交互作用</td>
+<td>依使用者的問題</td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="注意事項清單節錄" class="level3">
 <h3 class="anchored" data-anchor-id="注意事項清單節錄">注意事項清單（節錄）</h3>
@@ -4953,9 +5036,24 @@ z-index: 1000;
 <li><strong>Python 版不做 GLMM</strong>（statsmodels 沒有和 R 相同的估計方法，數字會和課本對不上）。需要 GLMM 時，Skill 會把 <code>methods.md</code> 的 R 程式碼交給使用者在 RStudio 執行。</li>
 </ul>
 </section>
-<section id="跟著做要貼給-claude-的話" class="level3">
-<h3 class="anchored" data-anchor-id="跟著做要貼給-claude-的話">跟著做：要貼給 Claude 的話</h3>
-<p>每一題開一個新對話，上傳 <code>student_por.csv</code>：</p>
+<section id="跟著做第一個指令" class="level3">
+<h3 class="anchored" data-anchor-id="跟著做第一個指令">跟著做：第一個指令</h3>
+<p>示範資料放在 Part3 的 <code>data/</code> 資料夾（<code>data/student_por.csv</code>，欄位說明見 <code>data/README.md</code>）。在 Part3 資料夾開啟 Claude Code，輸入：</p>
+<pre class="text"><code>請用 categorical-correlated skill 分析 data/student_por.csv：學生三次考試的及格率有沒有改變？和性別有關嗎？</code></pre>
+<p>claude.ai 網頁版：先上傳 <code>student_por.csv</code>，指令改成「分析 student_por.csv」。</p>
+<p>接下來 Skill 會：</p>
+<ol type="1">
+<li>給資料總覽，指出 <code>G1</code>／<code>G2</code>／<code>G3</code> 等可能不獨立的線索；</li>
+<li>用一則訊息列出確認清單（同一位學生、幾分算及格、要整體平均還是同一個人的效果……），<strong>每一項由你回答</strong>，同意預設就回覆「照預設」；</li>
+<li>畫圖、判斷方法適不適合，等你回覆「用推薦的」；</li>
+<li>計算、解釋，然後建議最多 3 個下一步，<strong>由你選</strong>（例如「選 1」），也可以自己提出；</li>
+<li>你回覆「結束」時，產生 <code>data/output/整份分析報告_student_por.html</code>。</li>
+</ol>
+<p>Part 3 報告頁第 8 章就是用同一句指令走完的一次示範（選擇由開發者模擬）。</p>
+</section>
+<section id="其他可以試的問題" class="level3">
+<h3 class="anchored" data-anchor-id="其他可以試的問題">其他可以試的問題</h3>
+<p>每一題開一個新對話：</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -4971,22 +5069,17 @@ z-index: 1000;
 </thead>
 <tbody>
 <tr class="odd">
-<td>請用 categorical-correlated skill 分析 student_por.csv：學生平日和週末的喝酒程度一樣嗎？</td>
+<td>請用 categorical-correlated skill 分析 data/student_por.csv：學生平日和週末的喝酒程度一樣嗎？</td>
 <td>Dalc、Walc 是同一位學生的平日、週末喝酒程度；1 &lt; 2 &lt; 3 &lt; 4 &lt; 5；其他照預設 → 用推薦的</td>
 <td>有序配對；週末較高</td>
 </tr>
 <tr class="even">
-<td>請用 categorical-correlated skill 分析 student_por.csv：媽媽和爸爸的職業分布不同嗎？</td>
+<td>請用 categorical-correlated skill 分析 data/student_por.csv：媽媽和爸爸的職業分布不同嗎？</td>
 <td>Mjob、Fjob 是同一位學生的媽媽、爸爸職業；沒有順序；其他照預設 → 用推薦的</td>
 <td>名目配對；媽媽較多「在家」</td>
 </tr>
 <tr class="odd">
-<td>請用 categorical-correlated skill 分析 student_por.csv：三次考試的及格率有變化嗎？和性別有關嗎？</td>
-<td>G1–G3 是同一位學生三次成績；10 分以上及格；我只想知道整體；其他照預設 → 用推薦的；再問「可以用概似比檢定比較 GEE 模型嗎？」</td>
-<td>GEE；說明 GEE 沒有概似函數</td>
-</tr>
-<tr class="even">
-<td>請用 categorical-correlated skill 分析 student_por.csv：有沒有上付費補習，和想不想讀大學有關嗎？</td>
+<td>請用 categorical-correlated skill 分析 data/student_por.csv：有沒有上付費補習，和想不想讀大學有關嗎？</td>
 <td>每一列是不同的學生</td>
 <td>轉介 Part 1</td>
 </tr>
@@ -5017,8 +5110,8 @@ z-index: 1000;
 </tr>
 <tr class="even">
 <td>2. Python 備案</td>
-<td>Python 版和課本比對、和 R 版逐項比對數字、警告、結論句（<code>dev/test_python.py</code>）</td>
-<td>57 / 57</td>
+<td>Python 版和課本比對、和 R 版逐項比對數字、警告、結論句；整份報告的 R 版與 Python 版輸出一致（<code>dev/test_python.py</code>）</td>
+<td>62 / 62</td>
 </tr>
 <tr class="odd">
 <td>3. 真實資料</td>
@@ -5027,7 +5120,7 @@ z-index: 1000;
 </tr>
 </tbody>
 </table>
-<p>真實資料實測的詳細結果與比對表，見 Part 3 報告頁的「Skill 應用示範」。</p>
+<p>真實資料實測的詳細結果與比對表，見 Part 3 報告頁的「Skill 的驗證」；逐步分析的完整示範見「Skill 應用示範」。</p>
 </section>
 <section id="開發過程ai-怎麼幫忙我們怎麼決定" class="level2">
 <h2 class="anchored" data-anchor-id="開發過程ai-怎麼幫忙我們怎麼決定">開發過程：AI 怎麼幫忙、我們怎麼決定</h2>
@@ -5075,6 +5168,16 @@ z-index: 1000;
 <td>兩輪新對話實測，發現問題後修正再測</td>
 <td>組員回覆、AI 整理</td>
 </tr>
+<tr class="even">
+<td>逐步分析</td>
+<td>參考老師檢查過的兩份 Skill，改成每一步建議下一步、由使用者決定，最後產生整份報告；AI 先寫設計稿（<code>流程設計-逐步分析.md</code>）再實作</td>
+<td>組員核可設計</td>
+</tr>
+<tr class="odd">
+<td>上課示範</td>
+<td>加入 <code>data/</code> 資料夾、AI 的決策樹與第一個指令（沿用報告第 8 章的問題）</td>
+<td>組員提出需求、AI 提議指令</td>
+</tr>
 </tbody>
 </table>
 <p>開發過程中發現、而且改掉的問題（這些也是我們學到的地方）：</p>
@@ -5085,6 +5188,7 @@ z-index: 1000;
 <li><strong>Python 版的 SE 差了 0.00007</strong>：multgee 的 sandwich SE 用期望訊息矩陣（expected information），一開始用觀察訊息矩陣（observed）。改了之後完全一致。</li>
 <li><strong>實測時 Claude 自己取倒數</strong>：程式只輸出「平日 vs 週末」的勝算比 0.254，Claude 為了回答「週末 vs 平日」自己算 1/0.254。改成程式直接輸出兩個方向。</li>
 <li><strong>加入交互作用後兩種檢定意義不同</strong>：GLMM 拿掉主效果時連交互作用一起拿掉，GEE 沒有；實測中的 Claude 自己發現並說明了，我們把 GEE 改成一致。</li>
+<li><strong>整份報告重複資訊</strong>：每一步的報告開頭都有資料檔、方法等欄位，合成整份報告時重複出現；改成由 <code>build_report</code> 拿掉這幾行，方法改在每一步的標題下說明一次。</li>
 </ol>
 <p>完整紀錄見 <code>dev/ai-log.csv</code>。</p>
 </details>
@@ -5096,6 +5200,8 @@ z-index: 1000;
 <li>Python 版不做 GLMM，也不做 <code>ar1</code>、<code>unstructured</code> 的 working correlation（估計方式和 R 不同）。</li>
 <li>比例勝算假設沒有正式檢定；缺失資料只提醒，不做多重插補。</li>
 <li>評分者一致性（Kappa，§8.5）、Bradley–Terry（§8.6）不在範圍內。</li>
+<li>逐步分析目前只用開發者模擬的選擇測試過，還沒有由真人在新對話中完整走過一次。</li>
+<li>整份報告只輸出 HTML；沒有 Quarto 時改輸出 Markdown。</li>
 </ul>
 </section>
 <section id="參考文獻" class="level2">
