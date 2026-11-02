@@ -89,7 +89,10 @@ out += [f"- 分析步驟：共 {len(steps)} 步", ""]
 
 # ---- 2. Confirmed settings ----
 if log.get("settings"):
-    out += ["# 確認的設定", "", "以下設定在分析開始前和使用者確認過。", ""] + ["- " + s for s in log["settings"]] + [""]
+    intro = "以下設定在分析開始前和使用者確認過。"
+    if any(s.startswith("（第") for s in log["settings"]):
+        intro += "標示「（第 K 步起）」的是分析途中重新確認的設定。"
+    out += ["# 確認的設定", "", intro, ""] + ["- " + s for s in log["settings"]] + [""]
 
 # ---- 3. First look (stage 3) ----
 first_look = find_one(out_dir, r"^初步檢視_.*\.md$")
@@ -115,7 +118,7 @@ for k, s in enumerate(steps, start=1):
             problems.append(f"第 {k} 步的分析報告還沒有「## 結論與解釋」。")
         # The step section already names the data, method and reason; drop the report's own header lines.
         body = [x for x in embed_md(report, 1, os.path.basename(step_dir))
-                if not re.match(r"^- (資料檔|方法|資料結構|選擇理由)：", x)]
+                if not re.match(r"^- (資料檔|方法|資料結構|選擇理由|效果的意義)：", x)]
         out += body + [""]
     if s.get("suggestions"):
         rows = [f"| {i} | {md_cell(g.get('text'))}{'（推薦）' if g.get('recommended') is True else ''} | "

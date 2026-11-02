@@ -81,7 +81,10 @@ out <- c(out, sprintf("- 分析步驟：共 %d 步", length(log$steps)), "")
 
 # ---- 2. Confirmed settings ----
 if (length(log$settings)) {
-  out <- c(out, "# 確認的設定", "", "以下設定在分析開始前和使用者確認過。", "",
+  intro <- "以下設定在分析開始前和使用者確認過。"
+  if (any(startsWith(unlist(log$settings), "（第")))
+    intro <- paste0(intro, "標示「（第 K 步起）」的是分析途中重新確認的設定。")
+  out <- c(out, "# 確認的設定", "", intro, "",
            paste0("- ", unlist(log$settings)), "")
 }
 
@@ -109,7 +112,7 @@ for (k in seq_along(log$steps)) {
     }
     # The step section already names the data, method and reason; drop the report's own header lines.
     body <- embed_md(report, 1, basename(step_dir))
-    body <- body[!grepl("^- (資料檔|方法|資料結構|選擇理由)：", body)]
+    body <- body[!grepl("^- (資料檔|方法|資料結構|選擇理由|效果的意義)：", body)]
     out <- c(out, body, "")
   }
   if (length(s$suggestions)) {

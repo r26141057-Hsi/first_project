@@ -264,6 +264,17 @@ results.append(("report: 3 steps + 3 suggestion tables", int(qmd_text.count("###
                 qmd_text.count("### 下一步的建議") == 3))
 results.append(("report: no warnings on complete fixture", int("WARNING" not in proc.stdout), 1, 0,
                 "WARNING" not in proc.stdout))
+# settings re-confirmed mid-analysis are appended with a step marker and explained in the report
+log_p = os.path.join(pdir, "analysis_log.json")
+with open(log_p, encoding="utf-8") as f:
+    log = json.load(f)
+log["settings"].append("（第 2 步起）② 寬格式轉長格式：G1、G2、G3 → G")
+with open(log_p, "w", encoding="utf-8") as f:
+    json.dump(log, f, ensure_ascii=False)
+build_py(pdir)
+qmd_text = read_norm(qmd_p)
+later = "- （第 2 步起）② 寬格式轉長格式" in qmd_text and "分析途中重新確認的設定" in qmd_text
+results.append(("report: mid-analysis settings marked", int(later), 1, 0, later))
 # a missing conclusion and a step without its explanation are reported
 os.remove(os.path.join(pdir, "結論.md"))
 step1 = [f for f in os.listdir(os.path.join(pdir, "step1")) if f.startswith("分析報告_")][0]
