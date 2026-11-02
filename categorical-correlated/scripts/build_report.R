@@ -127,7 +127,7 @@ for (k in seq_along(log$steps)) {
 conclusion <- file.path(out_dir, "結論.md")
 out <- c(out, "# 結論與限制", "")
 if (file.exists(conclusion)) {
-  out <- c(out, embed_md(conclusion, 1, ""), "")
+  out <- c(out, embed_md(conclusion, 0, ""), "")
 } else {
   problems <- c(problems, "沒有 結論.md（整體結論與限制）。")
   out <- c(out, "> 尚未撰寫整體結論。", "")

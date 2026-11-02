@@ -128,7 +128,7 @@ for k, s in enumerate(steps, start=1):
 conclusion = os.path.join(out_dir, "結論.md")
 out += ["# 結論與限制", ""]
 if os.path.exists(conclusion):
-    out += embed_md(conclusion, 1, "") + [""]
+    out += embed_md(conclusion, 0, "") + [""]
 else:
     problems.append("沒有 結論.md（整體結論與限制）。")
     out += ["> 尚未撰寫整體結論。", ""]
